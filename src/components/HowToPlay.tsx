@@ -1,0 +1,140 @@
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Wallet, MousePointer, ShoppingCart, Trophy, Clock, Gift } from 'lucide-react';
+
+const steps = [
+  {
+    id: 1,
+    title: "Connect Your Wallet",
+    description: "Link your Solana wallet (Phantom or Solflare) to get started",
+    icon: Wallet,
+    details: ["Supports Phantom, Solflare, and other Solana wallets", "Your wallet must have SOL for ticket purchases", "Connection is secure and decentralized"]
+  },
+  {
+    id: 2,
+    title: "Select Your Numbers",
+    description: "Choose 5 numbers from 1 to 49 or use Quick Pick for random selection",
+    icon: MousePointer,
+    details: ["Pick 5 unique numbers from 1-49", "Use Quick Pick for instant random selection", "Review your selection before purchase"]
+  },
+  {
+    id: 3,
+    title: "Purchase Tickets",
+    description: "Buy tickets for 0.02 SOL each with bulk discounts available",
+    icon: ShoppingCart,
+    details: ["Individual tickets: 0.02 SOL each", "Bulk purchases get up to 40% discount", "Special bonuses for 25+ tickets"]
+  },
+  {
+    id: 4,
+    title: "Wait for Draw",
+    description: "Draws happen regularly using provably fair VRF technology",
+    icon: Clock,
+    details: ["Draws use Solana's Verifiable Random Function", "All draws are transparent and verifiable", "Results published immediately on blockchain"]
+  },
+  {
+    id: 5,
+    title: "Check Results & Claim",
+    description: "Match numbers to win incredible prizes automatically sent to your wallet",
+    icon: Trophy,
+    details: ["Match all 5 numbers for the jackpot", "Partial matches win smaller prizes", "Prizes automatically sent to your wallet"]
+  }
+];
+
+const HowToPlay = () => {
+  return (
+    <div className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center"
+      >
+        <h2 className="text-4xl font-bold text-foreground mb-4">How to Play</h2>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Playing the Crypto Lottery is simple and secure. Follow these easy steps to participate in our provably fair draws.
+        </p>
+      </motion.div>
+
+      <div className="grid gap-6 md:gap-8">
+        {steps.map((step, index) => (
+          <motion.div
+            key={step.id}
+            initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+          >
+            <Card className="bg-lottery-card border-lottery-border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+              <CardHeader className="pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-xl flex items-center justify-center shadow-lg">
+                      <step.icon className="h-6 w-6 text-primary-foreground" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Badge className="bg-primary/10 text-primary border-primary/20">
+                        Step {step.id}
+                      </Badge>
+                      <CardTitle className="text-xl text-foreground">{step.title}</CardTitle>
+                    </div>
+                    <p className="text-muted-foreground text-base">{step.description}</p>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="space-y-2">
+                  {step.details.map((detail, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                      <p className="text-sm text-muted-foreground">{detail}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Prize Structure */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        <Card className="bg-gradient-to-r from-primary/5 to-lottery-orange-light/20 border-primary/20">
+          <CardHeader>
+            <CardTitle className="text-center flex items-center justify-center gap-2">
+              <Gift className="h-6 w-6 text-primary" />
+              Prize Structure
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-lottery-card rounded-lg">
+                <div className="text-2xl font-bold text-primary mb-2">5 Matches</div>
+                <div className="text-sm text-muted-foreground">Jackpot Prize</div>
+                <div className="font-semibold text-foreground">Ferrari, Mercedes & More</div>
+              </div>
+              <div className="text-center p-4 bg-lottery-card rounded-lg">
+                <div className="text-2xl font-bold text-primary mb-2">4 Matches</div>
+                <div className="text-sm text-muted-foreground">Major Prize</div>
+                <div className="font-semibold text-foreground">$20,000 - $50,000</div>
+              </div>
+              <div className="text-center p-4 bg-lottery-card rounded-lg">
+                <div className="text-2xl font-bold text-primary mb-2">3 Matches</div>
+                <div className="text-sm text-muted-foreground">Consolation Prize</div>
+                <div className="font-semibold text-foreground">Tech & Gift Cards</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+};
+
+export default HowToPlay;

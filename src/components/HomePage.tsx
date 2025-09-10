@@ -54,7 +54,29 @@ const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
             <p className="text-sm text-muted-foreground">Solana Blockchain</p>
           </div>
         </div>
-        <WalletConnectButton />
+        <div className="flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-4 text-sm">
+            <button 
+              onClick={() => window.location.href = '#how-to-play'}
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              How to Play
+            </button>
+            <button 
+              onClick={() => window.location.href = '#terms'}
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              Terms
+            </button>
+            <button 
+              onClick={() => window.location.href = '#faq'}
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              FAQ
+            </button>
+          </nav>
+          <WalletConnectButton />
+        </div>
       </motion.header>
 
       {/* Hero Section */}
