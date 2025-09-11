@@ -7,7 +7,7 @@ import WalletConnectButton from './WalletConnectButton';
 import TicketPurchaseCard from './TicketPurchaseCard';
 import { Progress } from "@/components/ui/progress";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import ferrariImg from '@/assets/ferrari-488.jpg';
+import ferrariImg from '@/assets/IMG_5846.JPG';
 import mercedesImg from '@/assets/mercedes-amg.jpg';
 import cashPrizeImg from '@/assets/cash-prize.jpg';
 import dreamVacationImg from '@/assets/dream-vacation.jpg';
@@ -23,16 +23,10 @@ interface Prize {
 }
 
 const prizes: Prize[] = [
-  { id: 1, title: "Ferrari 488 Italia", description: "Supercar de luxe", image: ferrariImg, icon: Car, value: "$250,000" },
-  { id: 2, title: "Mercedes-AMG GT", description: "Coupé haute performance", image: mercedesImg, icon: Car, value: "$150,000" },
-  { id: 3, title: "Gros lot en cash", description: "$50,000 en espèces", image: cashPrizeImg, icon: DollarSign, value: "$50,000" },
-  { id: 4, title: "Voyage de rêve pour 2", description: "Séjour de luxe en resort", image: dreamVacationImg, icon: Plane, value: "$25,000" },
-  { id: 5, title: "Acompte immobilier", description: "$20,000 pour votre futur chez-vous", icon: Home, value: "$20,000" },
-  { id: 6, title: "Pack high‑tech premium", description: "iPhone 15 Pro + gadgets dernier cri", icon: Laptop, value: "$5,000" },
-  { id: 7, title: "Rolex Submariner", description: "Montre suisse de luxe", image: rolexImg, icon: Watch, value: "$15,000" },
-  { id: 8, title: "MacBook Pro M3 Max", description: "Ordinateur portable haut de gamme", icon: Laptop, value: "$4,000" },
-  { id: 9, title: "Bundle gaming & divertissement", description: "PS5, Xbox, accessoires & jeux", icon: Gamepad2, value: "$2,500" },
-  { id: 10, title: "Cadeaux de consolation", description: "Cartes cadeaux & merch exclusif", icon: Gift, value: "$500" }
+  { id: 1, title: "Miladys NFT ", description: "Ma grosse bite Mamos tu rallas", image: ferrariImg, icon: Car, value: "$2500" },
+  { id: 2, title: "Pokemon Card", description: "", image: mercedesImg, icon: Car, value: "$150" },
+  { id: 3, title: "BAG of PENGU", description: "", image: cashPrizeImg, icon: DollarSign, value: "$50" },
+  { id: 4, title: "Dream Holidays with Mamos", description: "", image: dreamVacationImg, icon: Plane, value: "$" },
 ];
 
 interface HomePageProps {
@@ -42,7 +36,7 @@ interface HomePageProps {
   poolTargetSol?: number; // objectif en SOL
 }
 
-const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 1000 }: HomePageProps) => {
+const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 10 }: HomePageProps) => {
   const [poolBalanceSol, setPoolBalanceSol] = useState<number>(0);
   const [isLoadingPool, setIsLoadingPool] = useState<boolean>(false);
 

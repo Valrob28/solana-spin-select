@@ -62,26 +62,41 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
       if (!toAddress) throw new Error('Missing recipient wallet');
       if (!publicKey) throw new Error('Missing sender public key');
 
+      // Validate recipient
+      let toPubkey: PublicKey;
+      try { toPubkey = new PublicKey(toAddress); } catch { throw new Error('Invalid recipient address'); }
+
       const endpoint = (rpcEndpoint || (import.meta.env.VITE_SOLANA_RPC as string)) || 'https://api.mainnet-beta.solana.com';
       const connection = new Connection(endpoint, 'confirmed');
 
       const lamports = Math.round(selectedOption.price * LAMPORTS_PER_SOL);
+      if (lamports <= 0) throw new Error('Invalid amount');
 
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: new PublicKey(toAddress),
-          lamports,
-        })
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      const transaction = new Transaction({ feePayer: publicKey, recentBlockhash: blockhash }).add(
+        SystemProgram.transfer({ fromPubkey: publicKey, toPubkey, lamports })
       );
 
+      // Optional: simulate to catch errors like insufficient funds before prompting wallet
+      try {
+        await connection.simulateTransaction(transaction);
+      } catch (simErr: any) {
+        console.error('Simulation error', simErr);
+      }
+
       const signature = await sendTransaction(transaction, connection, { skipPreflight: false });
-      await connection.confirmTransaction(signature, 'confirmed');
+      await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
 
       onPurchaseTickets(selectedOption.quantity);
       toast({ title: 'Payment sent', description: `Signature: ${signature.slice(0, 8)}…` });
     } catch (err: any) {
-      toast({ title: 'Payment failed', description: err?.message || String(err), variant: 'destructive' });
+      const message = (err?.message || String(err)).toLowerCase();
+      let hint = '';
+      if (message.includes('insufficient') || message.includes('0x1')) hint = 'Insufficient SOL. Please top up your wallet.';
+      if (message.includes('blockhash')) hint = 'Please try again; the recent blockhash may have expired.';
+      if (message.includes('rejected')) hint = 'Transaction was rejected in the wallet.';
+      console.error('Payment failed', err);
+      toast({ title: 'Payment failed', description: hint || (err?.message || String(err)), variant: 'destructive' });
     }
   };
 
