@@ -1,8 +1,12 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Sparkles, Car, Home, DollarSign, Plane, Watch, Laptop, Gamepad2, Gift } from 'lucide-react';
 import WalletConnectButton from './WalletConnectButton';
+import TicketPurchaseCard from './TicketPurchaseCard';
+import { Progress } from "@/components/ui/progress";
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import ferrariImg from '@/assets/ferrari-488.jpg';
 import mercedesImg from '@/assets/mercedes-amg.jpg';
 import cashPrizeImg from '@/assets/cash-prize.jpg';
@@ -19,23 +23,48 @@ interface Prize {
 }
 
 const prizes: Prize[] = [
-  { id: 1, title: "Ferrari 488 Italia", description: "Luxury sports car", image: ferrariImg, icon: Car, value: "$250,000" },
-  { id: 2, title: "Mercedes-AMG GT", description: "High-performance coupe", image: mercedesImg, icon: Car, value: "$150,000" },
-  { id: 3, title: "Luxury Cash Prize", description: "$50,000 in cash", image: cashPrizeImg, icon: DollarSign, value: "$50,000" },
-  { id: 4, title: "Dream Vacation for 2", description: "Luxury resort getaway", image: dreamVacationImg, icon: Plane, value: "$25,000" },
-  { id: 5, title: "Real Estate Down Payment", description: "$20,000 cash for your dream home", icon: Home, value: "$20,000" },
-  { id: 6, title: "High-End Tech Pack", description: "iPhone 15 Pro + latest gadgets", icon: Laptop, value: "$5,000" },
-  { id: 7, title: "Rolex Submariner", description: "Luxury Swiss timepiece", image: rolexImg, icon: Watch, value: "$15,000" },
-  { id: 8, title: "MacBook Pro M3 Max", description: "Top-of-the-line laptop", icon: Laptop, value: "$4,000" },
-  { id: 9, title: "Gaming & Entertainment Bundle", description: "PS5, Xbox, accessories & games", icon: Gamepad2, value: "$2,500" },
-  { id: 10, title: "Consolation Gifts", description: "Gift cards & exclusive merch", icon: Gift, value: "$500" }
+  { id: 1, title: "Ferrari 488 Italia", description: "Supercar de luxe", image: ferrariImg, icon: Car, value: "$250,000" },
+  { id: 2, title: "Mercedes-AMG GT", description: "Coupé haute performance", image: mercedesImg, icon: Car, value: "$150,000" },
+  { id: 3, title: "Gros lot en cash", description: "$50,000 en espèces", image: cashPrizeImg, icon: DollarSign, value: "$50,000" },
+  { id: 4, title: "Voyage de rêve pour 2", description: "Séjour de luxe en resort", image: dreamVacationImg, icon: Plane, value: "$25,000" },
+  { id: 5, title: "Acompte immobilier", description: "$20,000 pour votre futur chez-vous", icon: Home, value: "$20,000" },
+  { id: 6, title: "Pack high‑tech premium", description: "iPhone 15 Pro + gadgets dernier cri", icon: Laptop, value: "$5,000" },
+  { id: 7, title: "Rolex Submariner", description: "Montre suisse de luxe", image: rolexImg, icon: Watch, value: "$15,000" },
+  { id: 8, title: "MacBook Pro M3 Max", description: "Ordinateur portable haut de gamme", icon: Laptop, value: "$4,000" },
+  { id: 9, title: "Bundle gaming & divertissement", description: "PS5, Xbox, accessoires & jeux", icon: Gamepad2, value: "$2,500" },
+  { id: 10, title: "Cadeaux de consolation", description: "Cartes cadeaux & merch exclusif", icon: Gift, value: "$500" }
 ];
 
 interface HomePageProps {
   onConnectAndPlay: () => void;
+  onPurchaseTickets?: (quantity: number) => void;
+  poolWalletAddress?: string;
+  poolTargetSol?: number; // objectif en SOL
 }
 
-const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
+const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 1000 }: HomePageProps) => {
+  const [poolBalanceSol, setPoolBalanceSol] = useState<number>(0);
+  const [isLoadingPool, setIsLoadingPool] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!poolWalletAddress) return;
+      try {
+        setIsLoadingPool(true);
+        const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+        const pubkey = new PublicKey(poolWalletAddress);
+        const lamports = await connection.getBalance(pubkey);
+        setPoolBalanceSol(lamports / LAMPORTS_PER_SOL);
+      } catch (error) {
+        setPoolBalanceSol(0);
+      } finally {
+        setIsLoadingPool(false);
+      }
+    };
+    fetchBalance();
+  }, [poolWalletAddress]);
+
+  const progressValue = Math.max(0, Math.min(100, poolTargetSol > 0 ? (poolBalanceSol / poolTargetSol) * 100 : 0));
   return (
     <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
       {/* Header */}
@@ -51,7 +80,7 @@ const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Crypto Lottery</h1>
-            <p className="text-sm text-muted-foreground">Solana Blockchain</p>
+            <p className="text-sm text-muted-foreground">Blockchain Solana</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -60,13 +89,13 @@ const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
               onClick={() => window.location.href = '#how-to-play'}
               className="text-muted-foreground hover:text-primary transition-colors"
             >
-              How to Play
+              Comment jouer
             </button>
             <button 
               onClick={() => window.location.href = '#terms'}
               className="text-muted-foreground hover:text-primary transition-colors"
             >
-              Terms
+              Conditions
             </button>
             <button 
               onClick={() => window.location.href = '#faq'}
@@ -93,12 +122,12 @@ const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
         </div>
         
         <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary via-lottery-orange to-lottery-orange-dark bg-clip-text text-transparent">
-          Win Incredible Prizes
+          Gagnez des lots incroyables
         </h2>
         
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-          Buy a ticket for <span className="font-bold text-primary">0.02 SOL</span>, pick your lucky numbers, 
-          and stand a chance to win amazing prizes worth over $500,000!
+          Achetez un ticket pour <span className="font-bold text-primary">0.02 SOL</span>, choisissez vos numéros porte‑bonheur,
+          et tentez de gagner des récompenses d’une valeur de plus de $500,000 !
         </p>
         
         <Button 
@@ -107,67 +136,87 @@ const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
           className="bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
         >
           <Trophy className="mr-3 h-5 w-5" />
-          Connect Wallet & Play Now
+          Connecter le wallet et jouer
         </Button>
       </motion.section>
 
-      {/* Prizes Grid */}
+      {/* Purchase + Pool Progress + Prizes */}
       <motion.section 
         className="px-6 pb-16 max-w-7xl mx-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.4 }}
       >
-        <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold text-foreground mb-4">Amazing Prizes to Win</h3>
-          <p className="text-muted-foreground text-lg">10 incredible prizes waiting for lucky winners</p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Colonne achat */}
+          <div className="lg:col-span-1 order-1 lg:order-none">
+            <TicketPurchaseCard selectedNumbers={[]} onPurchaseTickets={(q) => onPurchaseTickets && onPurchaseTickets(q)} allowWithoutNumbers />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          {prizes.map((prize, index) => (
-            <motion.div
-              key={prize.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-              whileHover={{ y: -5, scale: 1.02 }}
-              className="h-full"
-            >
-              <Card className="h-full bg-lottery-card border-lottery-border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                <CardContent className="p-0 h-full flex flex-col">
-                  {/* Prize Image or Icon */}
-                  <div className="relative h-40 bg-gradient-to-br from-lottery-orange-light to-accent overflow-hidden">
-                    {prize.image ? (
-                      <img 
-                        src={prize.image} 
-                        alt={prize.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <prize.icon className="h-16 w-16 text-primary" />
+            {/* Pool progress */}
+            <div className="mt-6 p-5 rounded-xl border border-lottery-border bg-lottery-card shadow-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Montant levé pour le prize pool</span>
+                <span className="text-sm font-medium text-foreground">{isLoadingPool ? '—' : poolBalanceSol.toFixed(2)} / {poolTargetSol.toLocaleString()} SOL</span>
+              </div>
+              <Progress value={progressValue} />
+              <p className="text-xs text-muted-foreground mt-2">
+                Remboursement garanti si l’objectif n’est pas atteint avant la date limite.
+              </p>
+            </div>
+          </div>
+
+          {/* Grille des lots */}
+          <div className="lg:col-span-2">
+            <div className="text-left mb-6">
+              <h3 className="text-3xl font-bold text-foreground mb-2">Des lots exceptionnels à gagner</h3>
+              <p className="text-muted-foreground text-lg">10 récompenses incroyables pour les gagnants</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {prizes.map((prize, index) => (
+                <motion.div
+                  key={prize.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 + index * 0.05 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  className="h-full"
+                >
+                  <Card className="h-full bg-lottery-card border-lottery-border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                    <CardContent className="p-0 h-full flex flex-col">
+                      <div className="relative h-40 bg-gradient-to-br from-lottery-orange-light to-accent overflow-hidden">
+                        {prize.image ? (
+                          <img 
+                            src={prize.image} 
+                            alt={prize.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <prize.icon className="h-16 w-16 text-primary" />
+                          </div>
+                        )}
+                        <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
+                          {prize.value}
+                        </div>
                       </div>
-                    )}
-                    <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground px-2 py-1 rounded-lg text-xs font-medium">
-                      {prize.value}
-                    </div>
-                  </div>
-                  
-                  {/* Prize Info */}
-                  <div className="p-4 flex-1 flex flex-col">
-                    <h4 className="font-bold text-foreground text-sm mb-2 line-clamp-1">{prize.title}</h4>
-                    <p className="text-muted-foreground text-xs flex-1 line-clamp-2">{prize.description}</p>
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className="text-xs text-primary font-medium">Prize #{prize.id}</span>
-                      <div className="w-6 h-6 rounded-full bg-lottery-orange-light flex items-center justify-center">
-                        <prize.icon className="h-3 w-3 text-primary" />
+                      
+                      <div className="p-4 flex-1 flex flex-col">
+                        <h4 className="font-bold text-foreground text-sm mb-2 line-clamp-1">{prize.title}</h4>
+                        <p className="text-muted-foreground text-xs flex-1 line-clamp-2">{prize.description}</p>
+                        <div className="mt-3 flex items-center justify-between">
+                          <span className="text-xs text-primary font-medium">Lot n°{prize.id}</span>
+                          <div className="w-6 h-6 rounded-full bg-lottery-orange-light flex items-center justify-center">
+                            <prize.icon className="h-3 w-3 text-primary" />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </motion.section>
 
@@ -178,16 +227,16 @@ const HomePage = ({ onConnectAndPlay }: HomePageProps) => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1 }}
       >
-        <h3 className="text-3xl font-bold text-foreground mb-4">Ready to Win?</h3>
+        <h3 className="text-3xl font-bold text-foreground mb-4">Prêt à tenter votre chance ?</h3>
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Connect your Solana wallet and pick your lucky numbers. Your next ticket could change everything!
+          Connectez votre wallet Solana et choisissez vos numéros porte‑bonheur. Votre prochain ticket peut tout changer !
         </p>
         <Button 
           onClick={onConnectAndPlay}
           size="lg"
           className="bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
         >
-          Start Playing Now
+          Commencer à jouer
         </Button>
       </motion.section>
     </div>

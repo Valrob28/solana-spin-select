@@ -28,9 +28,10 @@ const ticketOptions: TicketOption[] = [
 interface TicketPurchaseCardProps {
   selectedNumbers: number[];
   onPurchaseTickets: (quantity: number) => void;
+  allowWithoutNumbers?: boolean;
 }
 
-const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurchaseCardProps) => {
+const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNumbers = false }: TicketPurchaseCardProps) => {
   const [selectedOption, setSelectedOption] = useState<TicketOption>(ticketOptions[0]);
   const { connected } = useWallet();
   const { toast } = useToast();
@@ -45,10 +46,10 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
       return;
     }
 
-    if (selectedNumbers.length !== 5) {
+    if (!allowWithoutNumbers && selectedNumbers.length !== 5) {
       toast({
-        title: "Incomplete selection",
-        description: "Please select exactly 5 numbers first.",
+        title: "Sélection incomplète",
+        description: "Veuillez d'abord choisir exactement 5 numéros.",
         variant: "destructive",
       });
       return;
@@ -65,12 +66,12 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
       className="sticky top-6"
     >
       <Card className="bg-lottery-card border-lottery-border shadow-xl overflow-hidden">
-        <CardHeader className="pb-4 bg-gradient-to-r from-primary/5 to-lottery-orange-light/20">
+        <CardHeader className="pb-4 bg-gradient-to-r from-primary/10 to-accent/10">
           <CardTitle className="text-xl flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <Ticket className="h-5 w-5 text-primary-foreground" />
             </div>
-            Buy Your Lottery Tickets
+            Acheter des tickets
           </CardTitle>
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-primary" />
@@ -84,7 +85,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
           {/* Selected Numbers Display */}
           {selectedNumbers.length > 0 && (
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm font-medium text-muted-foreground mb-2">Your Numbers</p>
+              <p className="text-sm font-medium text-muted-foreground mb-2">Vos numéros</p>
               <div className="flex gap-2 flex-wrap">
                 {selectedNumbers.map((number) => (
                   <div
@@ -100,7 +101,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
 
           {/* Ticket Options */}
           <div className="space-y-3">
-            <p className="font-medium text-foreground">Choose Tickets</p>
+            <p className="font-medium text-foreground">Choisissez vos tickets</p>
             <div className="grid grid-cols-2 gap-3">
               {ticketOptions.map((option) => (
                 <motion.button
@@ -119,7 +120,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
                   {option.popular && (
                     <Badge className="absolute -top-2 -right-2 bg-primary text-primary-foreground">
                       <Zap className="h-3 w-3 mr-1" />
-                      Popular
+                      Populaire
                     </Badge>
                   )}
                   
@@ -150,24 +151,24 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
           </div>
 
           {/* Total Summary */}
-          <div className="bg-gradient-to-r from-primary/5 to-lottery-orange-light/20 rounded-lg p-4">
+          <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted-foreground">Quantity:</span>
+              <span className="text-muted-foreground">Quantité :</span>
               <span className="font-bold text-foreground">{selectedOption.quantity} tickets</span>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted-foreground">Price per ticket:</span>
+              <span className="text-muted-foreground">Prix par ticket :</span>
               <span className="font-bold text-foreground">0.02 SOL</span>
             </div>
             {selectedOption.discount && (
               <div className="flex justify-between items-center mb-2">
-                <span className="text-muted-foreground">Discount:</span>
+                <span className="text-muted-foreground">Réduction :</span>
                 <span className="font-bold text-green-600">-{selectedOption.discount}%</span>
               </div>
             )}
             <div className="border-t border-lottery-border pt-2 mt-2">
               <div className="flex justify-between items-center">
-                <span className="font-bold text-foreground">Total:</span>
+                <span className="font-bold text-foreground">Total :</span>
                 <span className="text-xl font-bold text-primary">{selectedOption.price.toFixed(2)} SOL</span>
               </div>
             </div>
@@ -176,12 +177,12 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
           {/* Purchase Button */}
           <Button
             onClick={handlePurchase}
-            disabled={!connected || selectedNumbers.length !== 5}
+            disabled={!connected || (!allowWithoutNumbers && selectedNumbers.length !== 5)}
             size="lg"
             className="w-full bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
             <Ticket className="mr-2 h-5 w-5" />
-            {!connected ? 'Connect Wallet' : selectedNumbers.length !== 5 ? 'Select 5 Numbers' : 'Buy Tickets'}
+            {!connected ? 'Connecter le wallet' : (!allowWithoutNumbers && selectedNumbers.length !== 5) ? 'Choisir 5 numéros' : 'Acheter les tickets'}
           </Button>
 
           {/* Special Offer */}
@@ -192,7 +193,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets }: TicketPurcha
               className="bg-gradient-to-r from-green-500/10 to-green-600/10 border border-green-200 rounded-lg p-4 text-center"
             >
               <Gift className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <p className="font-bold text-green-800 mb-1">Special Bonus!</p>
+              <p className="font-bold text-green-800 mb-1">Bonus spécial !</p>
               <p className="text-sm text-green-700">{selectedOption.bonus}</p>
             </motion.div>
           )}

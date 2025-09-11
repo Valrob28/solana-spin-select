@@ -63,7 +63,14 @@ const Index = () => {
   const renderContent = () => {
     switch (viewMode) {
       case 'home':
-        return <HomePage onConnectAndPlay={handleConnectAndPlay} />;
+        return (
+          <HomePage
+            onConnectAndPlay={handleConnectAndPlay}
+            onPurchaseTickets={handleBuyTicket}
+            poolWalletAddress={import.meta.env.VITE_POOL_WALLET}
+            poolTargetSol={Number(import.meta.env.VITE_POOL_TARGET_SOL) || 1000}
+          />
+        );
       
       case 'play':
         return (

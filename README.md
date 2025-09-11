@@ -1,16 +1,26 @@
-# Welcome to your Lovable project
+# Crypto Lottery (Solana)
 
-## Project info
+Projet React + Vite + shadcn/ui pour une loterie sur Solana.
 
-**URL**: https://lovable.dev/projects/ba002515-2152-484d-88b6-b5ce0414a092
+## Démarrer
 
-## How can I edit this code?
+```bash
+npm install
+npm run dev
+```
 
-There are several ways of editing your application.
+## Build
 
-**Use Lovable**
+```bash
+npm run build
+npm run preview
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ba002515-2152-484d-88b6-b5ce0414a092) and start prompting.
+## Tech
+- React 18, TypeScript, Vite
+- TailwindCSS, shadcn/ui
+- framer-motion
+- @solana/wallet-adapter
 
 Changes made via Lovable will be committed automatically to this repo.
 
