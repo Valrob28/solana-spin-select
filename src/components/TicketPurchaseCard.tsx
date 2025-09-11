@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useWallet } from '@solana/wallet-adapter-react';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import { Ticket, Zap, Gift, DollarSign } from 'lucide-react';
 
 interface TicketOption {
@@ -29,14 +30,16 @@ interface TicketPurchaseCardProps {
   selectedNumbers: number[];
   onPurchaseTickets: (quantity: number) => void;
   allowWithoutNumbers?: boolean;
+  recipient?: string; // Solana public key to receive funds
+  rpcEndpoint?: string; // optional custom RPC endpoint
 }
 
-const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNumbers = false }: TicketPurchaseCardProps) => {
+const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNumbers = false, recipient, rpcEndpoint }: TicketPurchaseCardProps) => {
   const [selectedOption, setSelectedOption] = useState<TicketOption>(ticketOptions[0]);
-  const { connected } = useWallet();
+  const { connected, publicKey, sendTransaction } = useWallet();
   const { toast } = useToast();
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     if (!connected) {
       toast({
         title: "Wallet not connected",
@@ -48,14 +51,38 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
 
     if (!allowWithoutNumbers && selectedNumbers.length !== 5) {
       toast({
-        title: "Sélection incomplète",
-        description: "Veuillez d'abord choisir exactement 5 numéros.",
+        title: "Incomplete selection",
+        description: "Please select exactly 5 numbers first.",
         variant: "destructive",
       });
       return;
     }
+    try {
+      const toAddress = (recipient || import.meta.env.VITE_POOL_WALLET) as string;
+      if (!toAddress) throw new Error('Missing recipient wallet');
+      if (!publicKey) throw new Error('Missing sender public key');
 
-    onPurchaseTickets(selectedOption.quantity);
+      const endpoint = (rpcEndpoint || (import.meta.env.VITE_SOLANA_RPC as string)) || 'https://api.mainnet-beta.solana.com';
+      const connection = new Connection(endpoint, 'confirmed');
+
+      const lamports = Math.round(selectedOption.price * LAMPORTS_PER_SOL);
+
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: new PublicKey(toAddress),
+          lamports,
+        })
+      );
+
+      const signature = await sendTransaction(transaction, connection, { skipPreflight: false });
+      await connection.confirmTransaction(signature, 'confirmed');
+
+      onPurchaseTickets(selectedOption.quantity);
+      toast({ title: 'Payment sent', description: `Signature: ${signature.slice(0, 8)}…` });
+    } catch (err: any) {
+      toast({ title: 'Payment failed', description: err?.message || String(err), variant: 'destructive' });
+    }
   };
 
   return (
@@ -71,7 +98,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <Ticket className="h-5 w-5 text-primary-foreground" />
             </div>
-            Acheter des tickets
+            Buy Lottery Tickets
           </CardTitle>
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-primary" />
@@ -85,7 +112,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
           {/* Selected Numbers Display */}
           {selectedNumbers.length > 0 && (
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm font-medium text-muted-foreground mb-2">Vos numéros</p>
+              <p className="text-sm font-medium text-muted-foreground mb-2">Your numbers</p>
               <div className="flex gap-2 flex-wrap">
                 {selectedNumbers.map((number) => (
                   <div
@@ -101,7 +128,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
 
           {/* Ticket Options */}
           <div className="space-y-3">
-            <p className="font-medium text-foreground">Choisissez vos tickets</p>
+            <p className="font-medium text-foreground">Choose tickets</p>
             <div className="grid grid-cols-2 gap-3">
               {ticketOptions.map((option) => (
                 <motion.button
@@ -120,7 +147,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
                   {option.popular && (
                     <Badge className="absolute -top-2 -right-2 bg-primary text-primary-foreground">
                       <Zap className="h-3 w-3 mr-1" />
-                      Populaire
+                      Popular
                     </Badge>
                   )}
                   
@@ -153,22 +180,22 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
           {/* Total Summary */}
           <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted-foreground">Quantité :</span>
+              <span className="text-muted-foreground">Quantity:</span>
               <span className="font-bold text-foreground">{selectedOption.quantity} tickets</span>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-muted-foreground">Prix par ticket :</span>
+              <span className="text-muted-foreground">Price per ticket:</span>
               <span className="font-bold text-foreground">0.02 SOL</span>
             </div>
             {selectedOption.discount && (
               <div className="flex justify-between items-center mb-2">
-                <span className="text-muted-foreground">Réduction :</span>
+                <span className="text-muted-foreground">Discount:</span>
                 <span className="font-bold text-green-600">-{selectedOption.discount}%</span>
               </div>
             )}
             <div className="border-t border-lottery-border pt-2 mt-2">
               <div className="flex justify-between items-center">
-                <span className="font-bold text-foreground">Total :</span>
+                <span className="font-bold text-foreground">Total:</span>
                 <span className="text-xl font-bold text-primary">{selectedOption.price.toFixed(2)} SOL</span>
               </div>
             </div>
@@ -182,7 +209,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
             className="w-full bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
             <Ticket className="mr-2 h-5 w-5" />
-            {!connected ? 'Connecter le wallet' : (!allowWithoutNumbers && selectedNumbers.length !== 5) ? 'Choisir 5 numéros' : 'Acheter les tickets'}
+            {!connected ? 'Connect wallet' : (!allowWithoutNumbers && selectedNumbers.length !== 5) ? 'Pick 5 numbers' : 'Buy tickets'}
           </Button>
 
           {/* Special Offer */}
@@ -193,7 +220,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
               className="bg-gradient-to-r from-green-500/10 to-green-600/10 border border-green-200 rounded-lg p-4 text-center"
             >
               <Gift className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <p className="font-bold text-green-800 mb-1">Bonus spécial !</p>
+              <p className="font-bold text-green-800 mb-1">Special bonus!</p>
               <p className="text-sm text-green-700">{selectedOption.bonus}</p>
             </motion.div>
           )}

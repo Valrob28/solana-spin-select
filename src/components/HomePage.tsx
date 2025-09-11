@@ -80,7 +80,7 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Crypto Lottery</h1>
-            <p className="text-sm text-muted-foreground">Blockchain Solana</p>
+            <p className="text-sm text-muted-foreground">Solana blockchain</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -89,13 +89,13 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
               onClick={() => window.location.href = '#how-to-play'}
               className="text-muted-foreground hover:text-primary transition-colors"
             >
-              Comment jouer
+              How to play
             </button>
             <button 
               onClick={() => window.location.href = '#terms'}
               className="text-muted-foreground hover:text-primary transition-colors"
             >
-              Conditions
+              Terms
             </button>
             <button 
               onClick={() => window.location.href = '#faq'}
@@ -122,12 +122,11 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         </div>
         
         <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary via-lottery-orange to-lottery-orange-dark bg-clip-text text-transparent">
-          Gagnez des lots incroyables
+          Win incredible prizes
         </h2>
         
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-          Achetez un ticket pour <span className="font-bold text-primary">0.02 SOL</span>, choisissez vos numéros porte‑bonheur,
-          et tentez de gagner des récompenses d’une valeur de plus de $500,000 !
+          Buy a ticket for <span className="font-bold text-primary">0.02 SOL</span>, pick your lucky numbers, and try to win rewards worth over $500,000!
         </p>
         
         <Button 
@@ -136,7 +135,7 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
           className="bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
         >
           <Trophy className="mr-3 h-5 w-5" />
-          Connecter le wallet et jouer
+          Connect wallet & play
         </Button>
       </motion.section>
 
@@ -150,26 +149,25 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Colonne achat */}
           <div className="lg:col-span-1 order-1 lg:order-none">
-            <TicketPurchaseCard selectedNumbers={[]} onPurchaseTickets={(q) => onPurchaseTickets && onPurchaseTickets(q)} allowWithoutNumbers />
+            <TicketPurchaseCard selectedNumbers={[]} onPurchaseTickets={(q) => onPurchaseTickets && onPurchaseTickets(q)} allowWithoutNumbers recipient={poolWalletAddress || import.meta.env.VITE_POOL_WALLET} rpcEndpoint={import.meta.env.VITE_SOLANA_RPC} />
 
-            {/* Pool progress */}
+            {/* Pool progress */
+            }
             <div className="mt-6 p-5 rounded-xl border border-lottery-border bg-lottery-card shadow-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Montant levé pour le prize pool</span>
+                <span className="text-sm text-muted-foreground">Raised for prize pool</span>
                 <span className="text-sm font-medium text-foreground">{isLoadingPool ? '—' : poolBalanceSol.toFixed(2)} / {poolTargetSol.toLocaleString()} SOL</span>
               </div>
               <Progress value={progressValue} />
-              <p className="text-xs text-muted-foreground mt-2">
-                Remboursement garanti si l’objectif n’est pas atteint avant la date limite.
-              </p>
+              <p className="text-xs text-muted-foreground mt-2">Refund guaranteed if the goal isn’t reached by the deadline.</p>
             </div>
           </div>
 
           {/* Grille des lots */}
           <div className="lg:col-span-2">
             <div className="text-left mb-6">
-              <h3 className="text-3xl font-bold text-foreground mb-2">Des lots exceptionnels à gagner</h3>
-              <p className="text-muted-foreground text-lg">10 récompenses incroyables pour les gagnants</p>
+              <h3 className="text-3xl font-bold text-foreground mb-2">Exceptional prizes to win</h3>
+              <p className="text-muted-foreground text-lg">10 amazing rewards for the winners</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -205,7 +203,7 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
                         <h4 className="font-bold text-foreground text-sm mb-2 line-clamp-1">{prize.title}</h4>
                         <p className="text-muted-foreground text-xs flex-1 line-clamp-2">{prize.description}</p>
                         <div className="mt-3 flex items-center justify-between">
-                          <span className="text-xs text-primary font-medium">Lot n°{prize.id}</span>
+                          <span className="text-xs text-primary font-medium">Prize #{prize.id}</span>
                           <div className="w-6 h-6 rounded-full bg-lottery-orange-light flex items-center justify-center">
                             <prize.icon className="h-3 w-3 text-primary" />
                           </div>
@@ -227,16 +225,14 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1 }}
       >
-        <h3 className="text-3xl font-bold text-foreground mb-4">Prêt à tenter votre chance ?</h3>
-        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Connectez votre wallet Solana et choisissez vos numéros porte‑bonheur. Votre prochain ticket peut tout changer !
-        </p>
+        <h3 className="text-3xl font-bold text-foreground mb-4">Ready to try your luck?</h3>
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto">Connect your Solana wallet and choose your lucky numbers. Your next ticket could change everything!</p>
         <Button 
           onClick={onConnectAndPlay}
           size="lg"
           className="bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 text-lg px-12 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
         >
-          Commencer à jouer
+          Start playing
         </Button>
       </motion.section>
     </div>

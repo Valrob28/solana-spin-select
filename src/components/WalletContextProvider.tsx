@@ -13,11 +13,11 @@ interface Props {
 }
 
 const WalletContextProvider: FC<Props> = ({ children }) => {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network = WalletAdapterNetwork.Devnet;
+  // Network can be overridden via VITE_SOLANA_NETWORK
+  const network = (import.meta.env.VITE_SOLANA_NETWORK as WalletAdapterNetwork) || WalletAdapterNetwork.Mainnet;
 
-  // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  // Custom RPC endpoint via VITE_SOLANA_RPC or fallback
+  const endpoint = useMemo(() => import.meta.env.VITE_SOLANA_RPC || clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
     () => [
