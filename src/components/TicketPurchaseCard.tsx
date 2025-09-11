@@ -72,20 +72,33 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
       const lamports = Math.round(selectedOption.price * LAMPORTS_PER_SOL);
       if (lamports <= 0) throw new Error('Invalid amount');
 
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
-      const transaction = new Transaction({ feePayer: publicKey, recentBlockhash: blockhash }).add(
+      // Ne pas fixer le recentBlockhash: laisser le wallet adapter en récupérer un frais
+      const transaction = new Transaction({ feePayer: publicKey }).add(
         SystemProgram.transfer({ fromPubkey: publicKey, toPubkey, lamports })
       );
 
-      // Optional: simulate to catch errors like insufficient funds before prompting wallet
-      try {
-        await connection.simulateTransaction(transaction);
-      } catch (simErr: any) {
-        console.error('Simulation error', simErr);
-      }
+      const tryOnce = async () => {
+        const sig = await sendTransaction(transaction, connection, {
+          skipPreflight: false,
+          preflightCommitment: 'processed',
+          maxRetries: 3,
+        });
+        await connection.confirmTransaction(sig, 'confirmed');
+        return sig;
+      };
 
-      const signature = await sendTransaction(transaction, connection, { skipPreflight: false });
-      await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+      let signature: string;
+      try {
+        signature = await tryOnce();
+      } catch (e: any) {
+        const msg = (e?.message || '').toLowerCase();
+        if (msg.includes('blockhash') || msg.includes('expired')) {
+          // Réessayer avec un nouveau recent blockhash géré par le wallet adapter
+          signature = await tryOnce();
+        } else {
+          throw e;
+        }
+      }
 
       onPurchaseTickets(selectedOption.quantity);
       toast({ title: 'Payment sent', description: `Signature: ${signature.slice(0, 8)}…` });
