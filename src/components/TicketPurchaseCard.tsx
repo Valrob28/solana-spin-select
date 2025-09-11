@@ -18,12 +18,8 @@ interface TicketOption {
 }
 
 const ticketOptions: TicketOption[] = [
-  { id: '1', quantity: 1, price: 0.02 },
-  { id: '5', quantity: 5, price: 0.09, discount: 10, popular: true },
-  { id: '10', quantity: 10, price: 0.16, discount: 20 },
-  { id: '25', quantity: 25, price: 0.35, discount: 30 },
-  { id: '50', quantity: 50, price: 0.65, discount: 35, bonus: 'Free NFT Badge' },
-  { id: '100', quantity: 100, price: 1.2, discount: 40, bonus: 'Premium Merch Package' },
+  { id: '1', quantity: 1, price: 0.01 },
+  { id: '5', quantity: 5, price: 0.04, bonus: 'Eligible for second draw' },
 ];
 
 interface TicketPurchaseCardProps {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,12 +23,8 @@ interface Prize {
 }
 
 const prizes: Prize[] = [
-  { id: 1, title: "Miladys NFT ", description: "Ma grosse bite Mamos tu rallas", image: ferrariImg, icon: Car, value: "$2500" },
-  { id: 2, title: "Pokemon Card", description: "", image: mercedesImg, icon: Car, value: "$150" },
-  { id: 3, title: "BAG of PENGU", description: "", image: cashPrizeImg, icon: DollarSign, value: "$50" },
-  { id: 4, title: "Dream Holidays with Mamos", description: "", image: dreamVacationImg, icon: Plane, value: "$" },
+  { id: 1, title: "RETARDIO NFT", description: "Exclusive NFT prize", image: ferrariImg, icon: Car, value: "$2500" },
 ];
-
 interface HomePageProps {
   onConnectAndPlay: () => void;
   onPurchaseTickets?: (quantity: number) => void;
@@ -36,29 +32,47 @@ interface HomePageProps {
   poolTargetSol?: number; // objectif en SOL
 }
 
-const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 10 }: HomePageProps) => {
+const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 2.5 }: HomePageProps) => {
   const [poolBalanceSol, setPoolBalanceSol] = useState<number>(0);
   const [isLoadingPool, setIsLoadingPool] = useState<boolean>(false);
 
+  const fetchBalance = async () => {
+    if (!poolWalletAddress) return;
+    try {
+      setIsLoadingPool(true);
+      const connection = new Connection(import.meta.env.VITE_SOLANA_RPC || 'https://api.mainnet-beta.solana.com', 'confirmed');
+      const pubkey = new PublicKey(poolWalletAddress);
+      const lamports = await connection.getBalance(pubkey);
+      setPoolBalanceSol(lamports / LAMPORTS_PER_SOL);
+    } catch {
+      // ignore
+    } finally {
+      setIsLoadingPool(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBalance = async () => {
-      if (!poolWalletAddress) return;
-      try {
-        setIsLoadingPool(true);
-        const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
-        const pubkey = new PublicKey(poolWalletAddress);
-        const lamports = await connection.getBalance(pubkey);
-        setPoolBalanceSol(lamports / LAMPORTS_PER_SOL);
-      } catch (error) {
-        setPoolBalanceSol(0);
-      } finally {
-        setIsLoadingPool(false);
-      }
-    };
+    if (!poolWalletAddress) return;
     fetchBalance();
+    const interval = window.setInterval(fetchBalance, 5000);
+    return () => {
+      window.clearInterval(interval);
+    };
   }, [poolWalletAddress]);
 
+  const handlePurchaseTickets = (quantity: number) => {
+    onPurchaseTickets?.(quantity);
+    // Refresh balance immediately after purchase
+    setTimeout(fetchBalance, 2000); // Wait 2s for transaction to be confirmed
+  };
+
   const progressValue = Math.max(0, Math.min(100, poolTargetSol > 0 ? (poolBalanceSol / poolTargetSol) * 100 : 0));
+  const ticketsRemaining = useMemo(() => {
+    const remainingSol = Math.max(0, poolTargetSol - poolBalanceSol);
+    const maxTickets = Math.ceil(remainingSol / 0.01); // si tout le monde prend 1 ticket
+    const minTickets = Math.ceil(remainingSol / 0.04); // si tout le monde prend bundle 5
+    return { min: minTickets, max: maxTickets };
+  }, [poolBalanceSol, poolTargetSol]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
       {/* Header */}
@@ -116,11 +130,16 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         </div>
         
         <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary via-lottery-orange to-lottery-orange-dark bg-clip-text text-transparent">
-          Win incredible prizes
+          <span className="inline-block animate-[fade-in_0.6s_ease-out]">Win</span>
+          <span className="inline-block ml-2 animate-[fade-in_0.8s_ease-out]">incredible</span>
+          <span className="inline-block ml-2 animate-[fade-in_1s_ease-out]">prizes</span>
         </h2>
         
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-          Buy a ticket for <span className="font-bold text-primary">0.02 SOL</span>, pick your lucky numbers, and try to win rewards worth over $500,000!
+          <span className="inline-block animate-[fade-in_1.2s_ease-out]">Buy</span>
+          <span className="inline-block ml-2 animate-[fade-in_1.4s_ease-out]">a ticket</span>
+          <span className="inline-block ml-2 animate-[fade-in_1.6s_ease-out]">from 0.01 SOL</span>
+          <span className="inline-block ml-2 animate-[fade-in_1.8s_ease-out]">and join the draw.</span>
         </p>
         
         <Button 
@@ -143,7 +162,7 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Colonne achat */}
           <div className="lg:col-span-1 order-1 lg:order-none">
-            <TicketPurchaseCard selectedNumbers={[]} onPurchaseTickets={(q) => onPurchaseTickets && onPurchaseTickets(q)} allowWithoutNumbers recipient={poolWalletAddress || import.meta.env.VITE_POOL_WALLET} rpcEndpoint={import.meta.env.VITE_SOLANA_RPC} />
+            <TicketPurchaseCard selectedNumbers={[]} onPurchaseTickets={handlePurchaseTickets} allowWithoutNumbers recipient={poolWalletAddress || import.meta.env.VITE_POOL_WALLET} rpcEndpoint={import.meta.env.VITE_SOLANA_RPC} />
 
             {/* Pool progress */
             }
@@ -153,6 +172,10 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
                 <span className="text-sm font-medium text-foreground">{isLoadingPool ? '—' : poolBalanceSol.toFixed(2)} / {poolTargetSol.toLocaleString()} SOL</span>
               </div>
               <Progress value={progressValue} />
+              <div className="mt-2 text-xs text-muted-foreground flex items-center justify-between">
+                <span>Tickets remaining: {ticketsRemaining.min}–{ticketsRemaining.max}</span>
+                <span>Total raised: {(poolBalanceSol).toFixed(2)} SOL</span>
+              </div>
               <p className="text-xs text-muted-foreground mt-2">Refund guaranteed if the goal isn’t reached by the deadline.</p>
             </div>
           </div>
