@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Sparkles, Car, Home, DollarSign, Plane, Watch, Laptop, Gamepad2, Gift } from 'lucide-react';
 import WalletConnectButton from './WalletConnectButton';
 import TicketPurchaseCard from './TicketPurchaseCard';
+import TicketPurchaseCardAnchor from './TicketPurchaseCardAnchor';
 import { Progress } from "@/components/ui/progress";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import ferrariImg from '@/assets/IMG_5846.JPG';
@@ -162,7 +163,7 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Colonne achat */}
           <div className="lg:col-span-1 order-1 lg:order-none">
-            <TicketPurchaseCard selectedNumbers={[]} onPurchaseTickets={handlePurchaseTickets} allowWithoutNumbers recipient={poolWalletAddress || import.meta.env.VITE_POOL_WALLET} rpcEndpoint={import.meta.env.VITE_SOLANA_RPC} />
+            <TicketPurchaseCardAnchor selectedNumbers={[]} onPurchaseTickets={handlePurchaseTickets} allowWithoutNumbers recipient={poolWalletAddress || import.meta.env.VITE_POOL_WALLET} rpcEndpoint={import.meta.env.VITE_SOLANA_RPC} raffleId={1} />
 
             {/* Pool progress */
             }
