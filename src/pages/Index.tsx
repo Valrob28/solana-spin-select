@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Ticket, History, HelpCircle, FileText, Info } from 'lucide-react';
+import { ArrowLeft, Ticket, History, HelpCircle, FileText, Info, Shield } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import HomePage from '@/components/HomePage';
 import NumberGrid from '@/components/NumberGrid';
@@ -12,8 +12,11 @@ import DrawHistory from '@/components/DrawHistory';
 import HowToPlay from '@/components/HowToPlay';
 import TermsAndDisclaimer from '@/components/TermsAndDisclaimer';
 import FAQ from '@/components/FAQ';
+import DrawManager from '@/components/DrawManager';
+import LotteryManager from '@/components/LotteryManager';
+import AdminPanel from '@/components/AdminPanel';
 
-type ViewMode = 'home' | 'play' | 'dashboard' | 'how-to-play' | 'terms' | 'faq';
+type ViewMode = 'home' | 'play' | 'dashboard' | 'how-to-play' | 'terms' | 'faq' | 'lottery-manager' | 'admin';
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('home');
@@ -60,6 +63,26 @@ const Index = () => {
     });
   };
 
+  const handleLotteryManager = () => {
+    setViewMode('lottery-manager');
+  };
+
+  const handleHowToPlay = () => {
+    setViewMode('how-to-play');
+  };
+
+  const handleTerms = () => {
+    setViewMode('terms');
+  };
+
+  const handleFAQ = () => {
+    setViewMode('faq');
+  };
+
+  const handleAdmin = () => {
+    setViewMode('admin');
+  };
+
   const renderContent = () => {
     switch (viewMode) {
       case 'home':
@@ -67,8 +90,13 @@ const Index = () => {
           <HomePage
             onConnectAndPlay={handleConnectAndPlay}
             onPurchaseTickets={handleBuyTicket}
-            poolWalletAddress={import.meta.env.VITE_POOL_WALLET}
-            poolTargetSol={Number(import.meta.env.VITE_POOL_TARGET_SOL) || 1000}
+            poolWalletAddress={import.meta.env.VITE_POOL_WALLET || '4egAsAmuctNJVDTzYqXTh9yXcr8LjjnCBSV7hy46xbPf'}
+            poolTargetSol={Number(import.meta.env.VITE_POOL_TARGET_SOL) || 2.5}
+            onLotteryManager={handleLotteryManager}
+            onHowToPlay={handleHowToPlay}
+            onTerms={handleTerms}
+            onFAQ={handleFAQ}
+            onAdmin={handleAdmin}
           />
         );
       
@@ -182,10 +210,14 @@ const Index = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-5 mb-8">
+                  <TabsList className="grid w-full grid-cols-6 mb-8">
                     <TabsTrigger value="tickets" className="flex items-center gap-2">
                       <Ticket className="h-4 w-4" />
                       My Tickets
+                    </TabsTrigger>
+                    <TabsTrigger value="draw" className="flex items-center gap-2">
+                      <History className="h-4 w-4" />
+                      Draw Results
                     </TabsTrigger>
                     <TabsTrigger value="history" className="flex items-center gap-2">
                       <History className="h-4 w-4" />
@@ -206,7 +238,14 @@ const Index = () => {
                   </TabsList>
                   
                   <TabsContent value="tickets">
-                    <TicketCard tickets={[]} onClaimPrize={handleClaimPrize} />
+                    <TicketCard 
+                      tickets={JSON.parse(localStorage.getItem('lotteryTickets') || '[]')} 
+                      onClaimPrize={handleClaimPrize} 
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="draw">
+                    <DrawManager isAdmin={false} />
                   </TabsContent>
                   
                   <TabsContent value="history">
@@ -226,6 +265,94 @@ const Index = () => {
                   </TabsContent>
                 </Tabs>
               </motion.div>
+            </div>
+          </div>
+        );
+
+      case 'lottery-manager':
+        return (
+          <LotteryManager onBack={() => setViewMode('home')} />
+        );
+
+      case 'admin':
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
+            <div className="max-w-7xl mx-auto p-4">
+              <div className="flex items-center gap-4 mb-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode('home')}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-6 w-6 text-primary" />
+                  <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
+                </div>
+              </div>
+              <AdminPanel />
+            </div>
+          </div>
+        );
+
+      case 'how-to-play':
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
+            <div className="max-w-4xl mx-auto p-4 sm:p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode('home')}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">How to Play</h1>
+              </div>
+              <HowToPlay />
+            </div>
+          </div>
+        );
+
+      case 'terms':
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
+            <div className="max-w-4xl mx-auto p-4 sm:p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode('home')}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Terms & Conditions</h1>
+              </div>
+              <TermsAndDisclaimer />
+            </div>
+          </div>
+        );
+
+      case 'faq':
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
+            <div className="max-w-4xl mx-auto p-4 sm:p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode('home')}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Frequently Asked Questions</h1>
+              </div>
+              <FAQ />
             </div>
           </div>
         );

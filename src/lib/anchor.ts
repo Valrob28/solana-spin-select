@@ -1,4 +1,4 @@
-import { AnchorProvider, Program, web3 } from '@coral-xyz/anchor';
+import { AnchorProvider, Program, web3, BN } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 
@@ -25,7 +25,8 @@ export interface Entry {
 }
 
 // Program ID - à remplacer par le vrai ID après déploiement
-export const RAFFLE_PROGRAM_ID = new PublicKey("RAfFLe11111111111111111111111111111111111");
+// Temporairement désactivé jusqu'au déploiement du smart contract
+export const RAFFLE_PROGRAM_ID = new PublicKey("11111111111111111111111111111111");
 
 // Seeds pour les PDAs
 export const getRafflePDA = (admin: PublicKey, raffleId: number) => {
@@ -164,7 +165,7 @@ export const buyTickets = async (
   const [entryPDA] = getEntryPDA(raffle, buyer);
 
   const tx = await program.methods
-    .buyTickets(new web3.BN(amount))
+    .buyTickets(new BN(amount))
     .accounts({
       buyer,
       raffle,

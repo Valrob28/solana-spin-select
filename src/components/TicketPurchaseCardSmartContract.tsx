@@ -1,52 +1,51 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
-import { Ticket, Zap, Gift, DollarSign } from 'lucide-react';
-// import { useRaffleProgram, buyTickets, getRaffleData, RAFFLE_PROGRAM_ID } from '@/lib/anchor';
+import { Ticket, DollarSign, Zap, Gift } from 'lucide-react';
+import { LotteryProgram } from '@/lib/lotteryProgram';
+import { Connection } from '@solana/web3.js';
 
-interface TicketOption {
-  id: string;
-  quantity: number;
-  price: number;
-  discount?: number;
-  popular?: boolean;
-  bonus?: string;
+interface TicketPurchaseCardSmartContractProps {
+  selectedNumbers: number[];
+  onPurchaseTickets: (quantity: number) => void;
+  allowWithoutNumbers?: boolean;
+  disabled?: boolean;
 }
 
-const ticketOptions: TicketOption[] = [
-  { id: '1', quantity: 1, price: 0.01 },
-  { id: '5', quantity: 5, price: 0.04, bonus: 'Eligible for second draw' },
+const ticketOptions = [
+  { id: 'single', quantity: 1, price: 0.01, popular: false },
+  { id: 'bundle', quantity: 5, price: 0.04, popular: true, discount: 20, bonus: 'Best value!' },
+  { id: 'mega', quantity: 10, price: 0.07, popular: false, discount: 30, bonus: 'Mega deal!' },
 ];
 
-interface TicketPurchaseCardProps {
-  selectedNumbers: number[];
-  onPurchaseTickets: (quantity: number, price: number) => void;
-  allowWithoutNumbers?: boolean;
-  recipient?: string; // Solana public key to receive funds
-  rpcEndpoint?: string; // optional custom RPC endpoint
-  raffleId?: number; // ID du raffle pour le smart contract
-}
+type TicketOption = typeof ticketOptions[0];
 
-const TicketPurchaseCardAnchor = ({ 
+const TicketPurchaseCardSmartContract = ({ 
   selectedNumbers, 
   onPurchaseTickets, 
   allowWithoutNumbers = false, 
-  recipient, 
-  rpcEndpoint,
-  raffleId = 1 
-}: TicketPurchaseCardProps) => {
+  disabled = false 
+}: TicketPurchaseCardSmartContractProps) => {
   const [selectedOption, setSelectedOption] = useState<TicketOption>(ticketOptions[0]);
-  const { connected, publicKey, sendTransaction } = useWallet();
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const { connected, publicKey, wallet } = useWallet();
   const { toast } = useToast();
-  const { getProgram } = useRaffleProgram();
 
   const handlePurchase = async () => {
-    if (!connected) {
+    if (disabled) {
+      toast({
+        title: "Pool complete",
+        description: "The prize pool has reached its target. Sales are closed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!connected || !publicKey || !wallet) {
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to purchase tickets.",
@@ -64,88 +63,80 @@ const TicketPurchaseCardAnchor = ({
       return;
     }
 
+    setIsPurchasing(true);
+
     try {
-      // Essayer d'abord le smart contract Anchor
-      try {
-        const program = await getProgram();
-        
-        // Créer les PDAs nécessaires
-        const [rafflePDA] = PublicKey.findProgramAddressSync(
-          [Buffer.from("raffle"), publicKey.toBuffer(), Buffer.from(raffleId.toString())],
-          RAFFLE_PROGRAM_ID
-        );
-        
-        const treasuryPDA = new PublicKey(recipient || import.meta.env.VITE_POOL_WALLET);
-        
-        // Appeler l'instruction buy_tickets du smart contract
-        const tx = await buyTickets(program, rafflePDA, treasuryPDA, selectedOption.quantity);
-        
-        toast({
-          title: "Smart contract purchase successful!",
-          description: `Transaction confirmed: ${tx}`,
-        });
-        
-        onPurchaseTickets(selectedOption.quantity, selectedOption.price);
-        return;
-        
-      } catch (anchorError) {
-        console.log("Anchor transaction failed, falling back to native SOL transfer:", anchorError);
-        
-        // Fallback vers transfert SOL natif
-        const toAddress = (recipient || import.meta.env.VITE_POOL_WALLET) as string;
-        if (!toAddress) throw new Error('Missing recipient wallet');
-        if (!publicKey) throw new Error('Missing sender public key');
+      // Connexion à la blockchain
+      const connection = new Connection(
+        import.meta.env.VITE_SOLANA_RPC || 'https://api.mainnet-beta.solana.com',
+        'confirmed'
+      );
 
-        let toPubkey: PublicKey;
-        try { 
-          toPubkey = new PublicKey(toAddress); 
-        } catch { 
-          throw new Error('Invalid recipient address'); 
+      // Créer l'instance du programme de loterie
+      const lotteryProgram = new LotteryProgram(connection, wallet.adapter);
+
+      // Acheter les tickets via le smart contract
+      const signature = await lotteryProgram.buyTickets(
+        selectedNumbers.length > 0 ? selectedNumbers : [1, 2, 3, 4, 5], // Fallback si pas de sélection
+        selectedOption.quantity
+      );
+
+      // Mettre à jour le localStorage avec les données du smart contract
+      if (selectedNumbers.length > 0) {
+        const existingTickets = JSON.parse(localStorage.getItem('lotteryTickets') || '[]');
+        
+        // Créer une entrée pour chaque ticket
+        for (let i = 0; i < selectedOption.quantity; i++) {
+          const ticketData = {
+            numbers: selectedNumbers,
+            quantity: 1,
+            timestamp: Date.now() + i,
+            txHash: signature,
+            buyer: publicKey.toString(),
+            ticketHash: `smart_contract_${signature}_${i}`,
+            smartContract: true, // Marquer comme venant du smart contract
+          };
+          
+          existingTickets.push(ticketData);
         }
-
-        const endpoint = (rpcEndpoint || (import.meta.env.VITE_SOLANA_RPC as string)) || 'https://api.mainnet-beta.solana.com';
-        const connection = new Connection(endpoint, 'confirmed');
-
-        const lamports = Math.round(selectedOption.price * LAMPORTS_PER_SOL);
-        if (lamports <= 0) throw new Error('Invalid amount');
-
-        const transaction = new Transaction({ feePayer: publicKey }).add(
-          SystemProgram.transfer({ fromPubkey: publicKey, toPubkey, lamports })
-        );
-
-        const signature = await sendTransaction(transaction, connection, {
-          skipPreflight: false,
-          preflightCommitment: 'processed',
-          maxRetries: 3,
-        });
-
-        await connection.confirmTransaction(signature, 'confirmed');
-
-        toast({
-          title: "Native SOL purchase successful!",
-          description: `Transaction confirmed: ${signature}`,
-        });
         
-        onPurchaseTickets(selectedOption.quantity, selectedOption.price);
+        localStorage.setItem('lotteryTickets', JSON.stringify(existingTickets));
       }
+
+      onPurchaseTickets(selectedOption.quantity);
       
+      toast({
+        title: "Tickets purchased successfully!",
+        description: `Transaction: ${signature.slice(0, 8)}...`,
+      });
+
     } catch (error: any) {
-      console.error("Purchase error:", error);
+      console.error('Smart contract purchase failed:', error);
       
-      let errorMessage = error?.message || "An unexpected error occurred.";
-      if (error.message.includes('insufficient funds')) {
-        errorMessage = "Insufficient funds in your wallet. Please top up and try again.";
-      } else if (error.message.includes('User rejected')) {
-        errorMessage = "Transaction rejected by user.";
-      } else if (error.message.includes('blockhash expired')) {
-        errorMessage = "Transaction expired. Please try again.";
+      let errorMessage = 'Failed to purchase tickets';
+      if (error.message) {
+        if (error.message.includes('InsufficientFunds')) {
+          errorMessage = 'Insufficient SOL. Please top up your wallet.';
+        } else if (error.message.includes('InvalidNumber')) {
+          errorMessage = 'Invalid numbers selected. Please choose numbers between 1-49.';
+        } else if (error.message.includes('DuplicateNumbers')) {
+          errorMessage = 'Duplicate numbers detected. Please select unique numbers.';
+        } else if (error.message.includes('PoolComplete')) {
+          errorMessage = 'The prize pool is complete. Sales are closed.';
+        } else if (error.message.includes('RaffleNotActive')) {
+          errorMessage = 'The lottery is not active.';
+        } else {
+          errorMessage = error.message;
+        }
       }
-      
+
       toast({
         title: "Purchase failed",
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsPurchasing(false);
     }
   };
 
@@ -162,7 +153,10 @@ const TicketPurchaseCardAnchor = ({
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <Ticket className="h-5 w-5 text-primary-foreground" />
             </div>
-            Buy Your Lottery Tickets
+            Buy Lottery Tickets
+            <Badge variant="secondary" className="ml-auto">
+              Smart Contract
+            </Badge>
           </CardTitle>
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-primary" />
@@ -173,9 +167,10 @@ const TicketPurchaseCardAnchor = ({
         </CardHeader>
 
         <CardContent className="p-6 space-y-6">
+          {/* Selected Numbers Display */}
           {selectedNumbers.length > 0 && (
             <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm font-medium text-muted-foreground mb-2">Your Numbers</p>
+              <p className="text-sm font-medium text-muted-foreground mb-2">Your numbers</p>
               <div className="flex gap-2 flex-wrap">
                 {selectedNumbers.map((number) => (
                   <div
@@ -189,9 +184,10 @@ const TicketPurchaseCardAnchor = ({
             </div>
           )}
 
+          {/* Ticket Options */}
           <div className="space-y-3">
-            <p className="font-medium text-foreground">Choose Tickets</p>
-            <div className="grid grid-cols-2 gap-3">
+            <p className="font-medium text-foreground">Choose tickets</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {ticketOptions.map((option) => (
                 <motion.button
                   key={option.id}
@@ -239,6 +235,7 @@ const TicketPurchaseCardAnchor = ({
             </div>
           </div>
 
+          {/* Total Summary */}
           <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
               <span className="text-muted-foreground">Quantity:</span>
@@ -254,24 +251,40 @@ const TicketPurchaseCardAnchor = ({
                 <span className="font-bold text-green-600">-{selectedOption.discount}%</span>
               </div>
             )}
-            <div className="border-t border-lottery-border pt-2 mt-2">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-foreground">Total:</span>
-                <span className="text-xl font-bold text-primary">{selectedOption.price.toFixed(2)} SOL</span>
-              </div>
+            <div className="flex justify-between items-center pt-2 border-t border-border">
+              <span className="text-lg font-bold text-foreground">Total:</span>
+              <span className="text-lg font-bold text-primary">{selectedOption.price.toFixed(2)} SOL</span>
             </div>
           </div>
 
+          {/* Smart Contract Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-sm text-blue-800">
+              <strong>🔒 Secure:</strong> Your numbers are recorded on the blockchain for transparency.
+            </p>
+          </div>
+
+          {/* Purchase Button */}
           <Button
             onClick={handlePurchase}
-            disabled={!connected || (!allowWithoutNumbers && selectedNumbers.length !== 5)}
+            disabled={disabled || !connected || (!allowWithoutNumbers && selectedNumbers.length !== 5) || isPurchasing}
             size="lg"
             className="w-full bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
             <Ticket className="mr-2 h-5 w-5" />
-            {!connected ? 'Connect Wallet' : (!allowWithoutNumbers && selectedNumbers.length !== 5) ? 'Select 5 Numbers' : 'Buy Tickets (Smart Contract)'}
+            {isPurchasing 
+              ? 'Processing...' 
+              : disabled 
+                ? 'Pool complete' 
+                : !connected 
+                  ? 'Connect wallet' 
+                  : (!allowWithoutNumbers && selectedNumbers.length !== 5) 
+                    ? 'Pick 5 numbers' 
+                    : 'Buy tickets (Smart Contract)'
+            }
           </Button>
 
+          {/* Special Offer */}
           {selectedOption.quantity >= 5 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -279,7 +292,7 @@ const TicketPurchaseCardAnchor = ({
               className="bg-gradient-to-r from-green-500/10 to-green-600/10 border border-green-200 rounded-lg p-4 text-center"
             >
               <Gift className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <p className="font-bold text-green-800 mb-1">Special Bonus!</p>
+              <p className="font-bold text-green-800 mb-1">Special bonus!</p>
               <p className="text-sm text-green-700">{selectedOption.bonus}</p>
             </motion.div>
           )}
@@ -289,4 +302,4 @@ const TicketPurchaseCardAnchor = ({
   );
 };
 
-export default TicketPurchaseCardAnchor;
+export default TicketPurchaseCardSmartContract;

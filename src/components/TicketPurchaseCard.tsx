@@ -20,24 +20,36 @@ interface TicketOption {
 
 const ticketOptions: TicketOption[] = [
   { id: '1', quantity: 1, price: 0.01 },
-  { id: '5', quantity: 5, price: 0.04, bonus: 'Eligible for second draw' },
+  { id: '5', quantity: 5, price: 0.04, discount: 20, bonus: 'Best value!', popular: true },
+  { id: '10', quantity: 10, price: 0.07, discount: 30, bonus: 'Mega deal!', popular: false },
 ];
 
 interface TicketPurchaseCardProps {
   selectedNumbers: number[];
   onPurchaseTickets: (quantity: number) => void;
   allowWithoutNumbers?: boolean;
+  onTicketQuantityChange?: (quantity: number) => void;
   recipient?: string; // Solana public key to receive funds
   rpcEndpoint?: string; // optional custom RPC endpoint
+  disabled?: boolean; // disable purchases when pool is complete
 }
 
-const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNumbers = false, recipient, rpcEndpoint }: TicketPurchaseCardProps) => {
+const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNumbers = false, onTicketQuantityChange, recipient, rpcEndpoint, disabled = false }: TicketPurchaseCardProps) => {
   const [selectedOption, setSelectedOption] = useState<TicketOption>(ticketOptions[0]);
   const { connected, publicKey, sendTransaction } = useWallet();
   const { toast } = useToast();
   const { getProgram } = useRaffleProgram();
 
   const handlePurchase = async () => {
+    if (disabled) {
+      toast({
+        title: "Pool complete",
+        description: "The prize pool has reached its target. Sales are closed.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!connected) {
       toast({
         title: "Wallet not connected",
@@ -98,6 +110,16 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
         }
       }
 
+      // Mettre à jour le hash de transaction dans localStorage
+      if (selectedNumbers.length > 0) {
+        const existingTickets = JSON.parse(localStorage.getItem('lotteryTickets') || '[]');
+        if (existingTickets.length > 0) {
+          // Mettre à jour le dernier ticket avec le hash de transaction
+          existingTickets[existingTickets.length - 1].txHash = signature;
+          localStorage.setItem('lotteryTickets', JSON.stringify(existingTickets));
+        }
+      }
+
       onPurchaseTickets(selectedOption.quantity);
       toast({ title: 'Payment sent', description: `Signature: ${signature.slice(0, 8)}…` });
     } catch (err: any) {
@@ -155,11 +177,14 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
           {/* Ticket Options */}
           <div className="space-y-3">
             <p className="font-medium text-foreground">Choose tickets</p>
-            <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {ticketOptions.map((option) => (
                 <motion.button
                   key={option.id}
-                  onClick={() => setSelectedOption(option)}
+                  onClick={() => {
+                    setSelectedOption(option);
+                    onTicketQuantityChange?.(option.quantity);
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`
@@ -211,7 +236,7 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
             </div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-muted-foreground">Price per ticket:</span>
-              <span className="font-bold text-foreground">0.02 SOL</span>
+              <span className="font-bold text-foreground">0.01 SOL</span>
             </div>
             {selectedOption.discount && (
               <div className="flex justify-between items-center mb-2">
@@ -230,12 +255,12 @@ const TicketPurchaseCard = ({ selectedNumbers, onPurchaseTickets, allowWithoutNu
           {/* Purchase Button */}
           <Button
             onClick={handlePurchase}
-            disabled={!connected || (!allowWithoutNumbers && selectedNumbers.length !== 5)}
+            disabled={disabled || !connected || (!allowWithoutNumbers && selectedNumbers.length !== 5)}
             size="lg"
             className="w-full bg-gradient-to-r from-primary to-lottery-orange-dark text-primary-foreground hover:from-primary/90 hover:to-lottery-orange-dark/90 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
             <Ticket className="mr-2 h-5 w-5" />
-            {!connected ? 'Connect wallet' : (!allowWithoutNumbers && selectedNumbers.length !== 5) ? 'Pick 5 numbers' : 'Buy tickets'}
+            {disabled ? 'Pool complete' : !connected ? 'Connect wallet' : (!allowWithoutNumbers && selectedNumbers.length !== 5) ? 'Pick 5 numbers' : 'Buy tickets'}
           </Button>
 
           {/* Special Offer */}

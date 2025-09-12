@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Ticket, Trophy, Clock, CheckCircle, XCircle, Gift } from 'lucide-react';
 
 interface Ticket {
-  id: string;
+  id?: string;
   numbers: number[];
-  purchaseDate: string;
-  status: 'pending' | 'won' | 'lost';
+  purchaseDate?: string;
+  status?: 'pending' | 'won' | 'lost';
   prize?: string;
   drawDate?: string;
+  quantity?: number;
+  timestamp?: number;
+  txHash?: string;
 }
 
 interface TicketCardProps {
@@ -85,7 +88,7 @@ const TicketCard = ({ tickets = mockTickets, onClaimPrize }: TicketCardProps) =>
     <div className="space-y-4">
       {tickets.map((ticket, index) => (
         <motion.div
-          key={ticket.id}
+          key={ticket.txHash || index}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -95,12 +98,12 @@ const TicketCard = ({ tickets = mockTickets, onClaimPrize }: TicketCardProps) =>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Ticket className="h-5 w-5 text-primary" />
-                  Ticket #{ticket.id}
+                  Ticket #{index + 1}
                 </CardTitle>
-                <Badge className={getStatusColor(ticket.status)}>
+                <Badge className={getStatusColor(ticket.status || 'pending')}>
                   <span className="flex items-center gap-1">
-                    {getStatusIcon(ticket.status)}
-                    {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                    {getStatusIcon(ticket.status || 'pending')}
+                    {(ticket.status || 'pending').charAt(0).toUpperCase() + (ticket.status || 'pending').slice(1)}
                   </span>
                 </Badge>
               </div>
@@ -123,23 +126,29 @@ const TicketCard = ({ tickets = mockTickets, onClaimPrize }: TicketCardProps) =>
                   </div>
                 </div>
 
-                {/* Dates and Status */}
+                {/* Transaction Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Purchase Date</p>
                     <p className="font-medium text-foreground">
-                      {new Date(ticket.purchaseDate).toLocaleDateString()}
+                      {ticket.timestamp ? new Date(ticket.timestamp).toLocaleDateString() : 'Unknown'}
                     </p>
                   </div>
-                  {ticket.drawDate && (
-                    <div>
-                      <p className="text-muted-foreground">Draw Date</p>
-                      <p className="font-medium text-foreground">
-                        {new Date(ticket.drawDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-muted-foreground">Transaction Hash</p>
+                    <p className="font-medium text-foreground font-mono text-xs">
+                      {ticket.txHash ? `${ticket.txHash.slice(0, 8)}...${ticket.txHash.slice(-8)}` : 'Pending'}
+                    </p>
+                  </div>
                 </div>
+
+                {/* Quantity */}
+                {ticket.quantity && (
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">Quantity</p>
+                    <p className="font-medium text-foreground">{ticket.quantity} ticket(s)</p>
+                  </div>
+                )}
 
                 {/* Prize Info */}
                 {ticket.status === 'won' && ticket.prize && (

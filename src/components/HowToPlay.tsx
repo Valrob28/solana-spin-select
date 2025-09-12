@@ -21,23 +21,23 @@ const steps = [
   {
     id: 3,
     title: "Purchase Tickets",
-    description: "Buy tickets for 0.02 SOL each with bulk discounts available",
+    description: "Buy tickets for 0.01 SOL each with bulk discounts available",
     icon: ShoppingCart,
-    details: ["Individual tickets: 0.02 SOL each", "Bulk purchases get up to 40% discount", "Special bonuses for 25+ tickets"]
+    details: ["Individual tickets: 0.01 SOL each", "5 tickets bundle: 0.04 SOL (20% discount)", "10 tickets bundle: 0.07 SOL (30% discount)"]
   },
   {
     id: 4,
-    title: "Wait for Draw",
-    description: "Draws happen regularly using provably fair VRF technology",
+    title: "Wait for Pool Target",
+    description: "Draw happens when the prize pool reaches 2.5 SOL target",
     icon: Clock,
-    details: ["Draws use Solana's Verifiable Random Function", "All draws are transparent and verifiable", "Results published immediately on blockchain"]
+    details: ["Pool target: 2.5 SOL collected", "Real-time progress tracking", "Automatic draw when target reached"]
   },
   {
     id: 5,
     title: "Check Results & Claim",
-    description: "Match numbers to win incredible prizes automatically sent to your wallet",
+    description: "Match numbers to win incredible NFT and crypto prizes",
     icon: Trophy,
-    details: ["Match all 5 numbers for the jackpot", "Partial matches win smaller prizes", "Prizes automatically sent to your wallet"]
+    details: ["Match all 5 numbers for the jackpot", "Win RETARDIO NFT ($450) or BAG OF PENGU ($50)", "Prizes automatically sent to your wallet"]
   }
 ];
 
@@ -52,7 +52,7 @@ const HowToPlay = () => {
       >
         <h2 className="text-4xl font-bold text-foreground mb-4">How to Play</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Playing the Crypto Lottery is simple and secure. Follow these easy steps to participate in our provably fair draws.
+          Solana Lottery tickets cost 0.01 SOL per play, with bulk discounts available. Players pick 5 numbers from 1 to 49 or use Quick Pick for random selection. The draw happens when the prize pool reaches 2.5 SOL target.
         </p>
       </motion.div>
 
@@ -113,22 +113,25 @@ const HowToPlay = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="text-center p-4 bg-lottery-card rounded-lg">
                 <div className="text-2xl font-bold text-primary mb-2">5 Matches</div>
                 <div className="text-sm text-muted-foreground">Jackpot Prize</div>
-                <div className="font-semibold text-foreground">Ferrari, Mercedes & More</div>
+                <div className="font-semibold text-foreground">RETARDIO NFT - $450</div>
               </div>
               <div className="text-center p-4 bg-lottery-card rounded-lg">
                 <div className="text-2xl font-bold text-primary mb-2">4 Matches</div>
-                <div className="text-sm text-muted-foreground">Major Prize</div>
-                <div className="font-semibold text-foreground">$20,000 - $50,000</div>
+                <div className="text-sm text-muted-foreground">Secondary Prize</div>
+                <div className="font-semibold text-foreground">BAG OF PENGU - $50</div>
               </div>
-              <div className="text-center p-4 bg-lottery-card rounded-lg">
-                <div className="text-2xl font-bold text-primary mb-2">3 Matches</div>
-                <div className="text-sm text-muted-foreground">Consolation Prize</div>
-                <div className="font-semibold text-foreground">Tech & Gift Cards</div>
-              </div>
+            </div>
+            
+            <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <h4 className="font-semibold text-foreground mb-2">🎯 Pool Target System</h4>
+              <p className="text-sm text-muted-foreground">
+                The lottery draw happens automatically when the prize pool reaches 2.5 SOL target. 
+                Track progress in real-time and watch the pool fill up with each ticket purchase!
+              </p>
             </div>
           </CardContent>
         </Card>

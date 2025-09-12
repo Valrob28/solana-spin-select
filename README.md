@@ -1,6 +1,6 @@
-# Crypto Lottery (Solana)
+# LuckySol.xyz
 
-Projet React + Vite + shadcn/ui pour une loterie sur Solana.
+Projet React + Vite + shadcn/ui pour une loterie sur Solana blockchain.
 
 ## Démarrer
 
