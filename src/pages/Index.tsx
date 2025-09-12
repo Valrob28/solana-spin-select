@@ -15,6 +15,8 @@ import FAQ from '@/components/FAQ';
 import DrawManager from '@/components/DrawManager';
 import LotteryManager from '@/components/LotteryManager';
 import AdminPanel from '@/components/AdminPanel';
+import MobileHeader from '@/components/MobileHeader';
+import Footer from '@/components/Footer';
 
 type ViewMode = 'home' | 'play' | 'dashboard' | 'how-to-play' | 'terms' | 'faq' | 'lottery-manager' | 'admin';
 
@@ -110,8 +112,15 @@ const Index = () => {
 
       case 'how-to-play':
         return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light">
-            <div className="max-w-6xl mx-auto p-6">
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light flex flex-col">
+            <MobileHeader 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+              onHome={() => setViewMode('home')}
+            />
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 flex-1">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -128,13 +137,26 @@ const Index = () => {
               </motion.div>
               <HowToPlay />
             </div>
+            <Footer 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+            />
           </div>
         );
 
       case 'terms':
         return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light">
-            <div className="max-w-6xl mx-auto p-6">
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light flex flex-col">
+            <MobileHeader 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+              onHome={() => setViewMode('home')}
+            />
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 flex-1">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -151,13 +173,26 @@ const Index = () => {
               </motion.div>
               <TermsAndDisclaimer />
             </div>
+            <Footer 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+            />
           </div>
         );
 
       case 'faq':
         return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light">
-            <div className="max-w-6xl mx-auto p-6">
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light flex flex-col">
+            <MobileHeader 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+              onHome={() => setViewMode('home')}
+            />
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 flex-1">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -174,13 +209,26 @@ const Index = () => {
               </motion.div>
               <FAQ />
             </div>
+            <Footer 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+            />
           </div>
         );
       
       case 'dashboard':
         return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light">
-            <div className="max-w-6xl mx-auto p-6">
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg to-lottery-orange-light flex flex-col">
+            <MobileHeader 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+              onHome={() => setViewMode('home')}
+            />
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 flex-1">
               {/* Header */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -266,6 +314,12 @@ const Index = () => {
                 </Tabs>
               </motion.div>
             </div>
+            <Footer 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+            />
           </div>
         );
 
@@ -276,8 +330,15 @@ const Index = () => {
 
       case 'admin':
         return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
-            <div className="max-w-7xl mx-auto p-4">
+          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light flex flex-col">
+            <MobileHeader 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+              onHome={() => setViewMode('home')}
+            />
+            <div className="max-w-7xl mx-auto p-4 flex-1">
               <div className="flex items-center gap-4 mb-6">
                 <Button 
                   variant="outline" 
@@ -294,68 +355,15 @@ const Index = () => {
               </div>
               <AdminPanel />
             </div>
+            <Footer 
+              onHowToPlay={handleHowToPlay}
+              onTerms={handleTerms}
+              onFAQ={handleFAQ}
+              onAdmin={handleAdmin}
+            />
           </div>
         );
 
-      case 'how-to-play':
-        return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
-            <div className="max-w-4xl mx-auto p-4 sm:p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setViewMode('home')}
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Home
-                </Button>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">How to Play</h1>
-              </div>
-              <HowToPlay />
-            </div>
-          </div>
-        );
-
-      case 'terms':
-        return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
-            <div className="max-w-4xl mx-auto p-4 sm:p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setViewMode('home')}
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Home
-                </Button>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Terms & Conditions</h1>
-              </div>
-              <TermsAndDisclaimer />
-            </div>
-          </div>
-        );
-
-      case 'faq':
-        return (
-          <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
-            <div className="max-w-4xl mx-auto p-4 sm:p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setViewMode('home')}
-                  className="flex items-center gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Home
-                </Button>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Frequently Asked Questions</h1>
-              </div>
-              <FAQ />
-            </div>
-          </div>
-        );
       
       default:
         return <HomePage onConnectAndPlay={handleConnectAndPlay} />;

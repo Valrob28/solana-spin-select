@@ -8,6 +8,8 @@ import WalletConnectButton from './WalletConnectButton';
 import TicketPurchaseCard from './TicketPurchaseCard';
 import NumberSelector from './NumberSelector';
 import TokenBanner from './TokenBanner';
+import MobileHeader from './MobileHeader';
+import Footer from './Footer';
 // import TicketPurchaseCardAnchor from './TicketPurchaseCardAnchor';
 import { Progress } from "@/components/ui/progress";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -119,10 +121,18 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
   // Vérifier si le pool est complet
   const isPoolComplete = poolBalanceSol >= poolTargetSol;
   return (
-    <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-b from-lottery-bg via-background to-lottery-orange-light flex flex-col">
+      {/* Mobile Header */}
+      <MobileHeader 
+        onHowToPlay={onHowToPlay}
+        onTerms={onTerms}
+        onFAQ={onFAQ}
+        onAdmin={onAdmin}
+      />
+
+      {/* Desktop Header */}
       <motion.header 
-        className="flex justify-between items-center p-4 sm:p-6 max-w-7xl mx-auto"
+        className="hidden lg:flex justify-between items-center p-4 sm:p-6 max-w-7xl mx-auto"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -167,9 +177,6 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
           <WalletConnectButton />
         </div>
       </motion.header>
-
-      {/* Token Banner */}
-      <TokenBanner />
 
       {/* Hero Section */}
       <motion.section 
@@ -376,6 +383,17 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
           Start playing
         </Button>
       </motion.section>
+
+      {/* Token Banner - Moved to bottom */}
+      <TokenBanner />
+
+      {/* Footer */}
+      <Footer 
+        onHowToPlay={onHowToPlay}
+        onTerms={onTerms}
+        onFAQ={onFAQ}
+        onAdmin={onAdmin}
+      />
     </div>
   );
 };

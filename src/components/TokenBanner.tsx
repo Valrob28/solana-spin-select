@@ -133,13 +133,14 @@ const TokenBanner = () => {
 
   return (
     <motion.div 
-      className="w-full bg-gradient-to-r from-primary/5 to-lottery-orange-light/5 border-b border-lottery-border overflow-hidden"
-      initial={{ opacity: 0, y: -20 }}
+      className="w-full bg-gradient-to-r from-primary/5 to-lottery-orange-light/5 border-t border-lottery-border overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
+      <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3">
+        {/* Header - Hidden on mobile */}
+        <div className="hidden sm:flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
             Top Solana Tokens
@@ -156,19 +157,28 @@ const TokenBanner = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-3">
-          {tokens.map((token, index) => (
+        {/* Mobile header */}
+        <div className="sm:hidden flex items-center justify-center mb-2">
+          <h3 className="text-xs font-semibold text-foreground flex items-center gap-1">
+            <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+            Live Prices
+          </h3>
+        </div>
+        
+        {/* Token grid - More compact on mobile */}
+        <div className="grid grid-cols-5 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1 sm:gap-3">
+          {tokens.slice(0, 10).map((token, index) => (
             <motion.div
               key={token.symbol}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-background/50 backdrop-blur-sm rounded-lg p-3 border border-lottery-border/50 hover:border-primary/30 transition-all duration-200 hover:shadow-md"
+              transition={{ delay: index * 0.05 }}
+              className="bg-background/50 backdrop-blur-sm rounded-lg p-1.5 sm:p-3 border border-lottery-border/50 hover:border-primary/30 transition-all duration-200 hover:shadow-md"
             >
-              <div className="flex flex-col items-center text-center space-y-1">
-                {/* Token Symbol */}
-                <div className="flex items-center gap-1">
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-background border border-lottery-border">
+              <div className="flex flex-col items-center text-center space-y-0.5 sm:space-y-1">
+                {/* Token Symbol - Compact on mobile */}
+                <div className="flex items-center gap-0.5 sm:gap-1">
+                  <div className="w-4 h-4 sm:w-6 sm:h-6 rounded-full overflow-hidden flex items-center justify-center bg-background border border-lottery-border">
                     <img 
                       src={token.image} 
                       alt={token.name}
@@ -180,31 +190,31 @@ const TokenBanner = () => {
                         const parent = target.parentElement;
                         if (parent) {
                           parent.innerHTML = `<span class="text-xs font-bold text-primary">${token.symbol.charAt(0)}</span>`;
-                          parent.className = 'w-6 h-6 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-full flex items-center justify-center';
+                          parent.className = 'w-4 h-4 sm:w-6 sm:h-6 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-full flex items-center justify-center';
                         }
                       }}
                     />
                   </div>
-                  <span className="text-xs font-bold text-foreground">
+                  <span className="text-xs font-bold text-foreground hidden sm:inline">
                     {token.symbol}
                   </span>
                 </div>
 
-                {/* Price */}
+                {/* Price - Smaller on mobile */}
                 <div className="text-xs font-semibold text-foreground">
                   {formatPrice(token.price)}
                 </div>
 
-                {/* 24h Change */}
-                <div className={`flex items-center gap-1 text-xs ${getChangeColor(token.change24h)}`}>
+                {/* 24h Change - Hidden on mobile */}
+                <div className={`hidden sm:flex items-center gap-1 text-xs ${getChangeColor(token.change24h)}`}>
                   {getChangeIcon(token.change24h)}
                   <span className="font-medium">
                     {token.change24h > 0 ? '+' : ''}{token.change24h.toFixed(2)}%
                   </span>
                 </div>
 
-                {/* Market Cap */}
-                <div className="text-xs text-muted-foreground">
+                {/* Market Cap - Hidden on mobile */}
+                <div className="hidden sm:block text-xs text-muted-foreground">
                   {formatMarketCap(token.marketCap)}
                 </div>
               </div>
