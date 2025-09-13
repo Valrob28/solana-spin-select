@@ -28,9 +28,9 @@ const steps = [
   {
     id: 4,
     title: "Wait for Pool Target",
-    description: "Draw happens when the prize pool reaches 2.5 SOL target",
+    description: "Draw happens when the prize pool reaches 0.1 SOL target",
     icon: Clock,
-    details: ["Pool target: 2.5 SOL collected", "Real-time progress tracking", "Automatic draw when target reached"]
+    details: ["Pool target: 0.1 SOL collected", "Real-time progress tracking", "Automatic draw when target reached"]
   },
   {
     id: 5,
@@ -52,7 +52,7 @@ const HowToPlay = () => {
       >
         <h2 className="text-4xl font-bold text-foreground mb-4">How to Play</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Solana Lottery tickets cost 0.01 SOL per play, with bulk discounts available. Players pick 5 numbers from 1 to 49 or use Quick Pick for random selection. The draw happens when the prize pool reaches 2.5 SOL target.
+          Solana Lottery tickets cost 0.01 SOL per play, with bulk discounts available. Players pick 5 numbers from 1 to 49 or use Quick Pick for random selection. The draw happens when the prize pool reaches 0.1 SOL target.
         </p>
       </motion.div>
 
@@ -129,7 +129,7 @@ const HowToPlay = () => {
             <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
               <h4 className="font-semibold text-foreground mb-2">🎯 Pool Target System</h4>
               <p className="text-sm text-muted-foreground">
-                The lottery draw happens automatically when the prize pool reaches 2.5 SOL target. 
+                The lottery draw happens automatically when the prize pool reaches 0.1 SOL target. 
                 Track progress in real-time and watch the pool fill up with each ticket purchase!
               </p>
             </div>

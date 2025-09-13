@@ -93,7 +93,7 @@ const Index = () => {
             onConnectAndPlay={handleConnectAndPlay}
             onPurchaseTickets={handleBuyTicket}
             poolWalletAddress={import.meta.env.VITE_POOL_WALLET || '4egAsAmuctNJVDTzYqXTh9yXcr8LjjnCBSV7hy46xbPf'}
-            poolTargetSol={Number(import.meta.env.VITE_POOL_TARGET_SOL) || 2.5}
+            poolTargetSol={0.1}
             onLotteryManager={handleLotteryManager}
             onHowToPlay={handleHowToPlay}
             onTerms={handleTerms}

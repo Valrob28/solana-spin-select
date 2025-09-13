@@ -51,7 +51,7 @@ interface HomePageProps {
   onAdmin?: () => void;
 }
 
-const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 2.5, onLotteryManager, onHowToPlay, onTerms, onFAQ, onAdmin }: HomePageProps) => {
+const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, poolTargetSol = 0.1, onLotteryManager, onHowToPlay, onTerms, onFAQ, onAdmin }: HomePageProps) => {
   const [poolBalanceSol, setPoolBalanceSol] = useState<number>(0);
   const [isLoadingPool, setIsLoadingPool] = useState<boolean>(false);
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -211,6 +211,7 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <span className="text-sm font-medium text-muted-foreground">Prize pool progress</span>
             <span className="text-base sm:text-lg font-bold text-foreground">{isLoadingPool ? '—' : poolBalanceSol.toFixed(2)} / {poolTargetSol.toLocaleString()} SOL</span>
+            {/* Debug: poolTargetSol = {poolTargetSol} */}
           </div>
           <Progress value={progressValue} className="h-3 mb-3" />
           <div className="text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
