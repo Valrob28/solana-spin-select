@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,51 +21,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Palette Solana: verts/bleus/violacés néon */
-    --background: 240 10% 6%;
-    --foreground: 0 0% 100%;
+    /* Palette claire avec Solana: verts/bleus/violacés néon */
+    --background: 0 0% 100%;
+    --foreground: 240 5.9% 10%;
 
-    --card: 240 12% 10%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 98%;
+    --card-foreground: 240 5.9% 10%;
 
-    --popover: 240 12% 10%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 240 5.9% 10%;
 
-    /* Dégradé Solana: #9945FF, #14F195, #00FFA3 approximés en HSL */
-    --primary: 278 100% 64%; /* violet 9945FF */
-    --primary-foreground: 240 10% 6%;
+    /* Dégradé Rouge: #EF4444, #F97316, #DC2626 approximés en HSL */
+    --primary: 0 84% 60%; /* rouge EF4444 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 10% 16%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 240 10% 14%;
-    --muted-foreground: 240 4% 72%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
 
-    --accent: 162 100% 49%; /* vert 14F195 */
-    --accent-foreground: 240 10% 6%;
+    --accent: 25 95% 53%; /* orange F97316 */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 12% 18%;
-    --input: 240 12% 18%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 162 100% 49%;
 
     --radius: 1rem;
     
-    --lottery-orange: 278 100% 64%;
-    --lottery-orange-light: 162 100% 49%;
-    --lottery-orange-dark: 168 100% 35%; /* proche 00FFA3 */
-    --lottery-bg: 240 10% 6%;
-    --lottery-card: 240 12% 10%;
-    --lottery-border: 240 12% 18%;
+    --lottery-orange: 0 84% 60%;
+    --lottery-orange-light: 25 95% 53%;
+    --lottery-orange-dark: 0 84% 50%; /* rouge DC2626 */
+    --lottery-bg: 0 0% 100%;
+    --lottery-card: 0 0% 98%;
+    --lottery-border: 220 13% 91%;
     
-    --gradient-orange: linear-gradient(135deg, hsl(278 100% 64%), hsl(162 100% 49%));
-    --gradient-soft: linear-gradient(180deg, hsl(240 10% 6%), hsl(240 12% 10%));
+    --gradient-orange: linear-gradient(135deg, hsl(0 84% 60%), hsl(25 95% 53%));
+    --gradient-soft: linear-gradient(180deg, hsl(0 0% 100%), hsl(240 4.8% 95.9%));
     
-    --shadow-soft: 0 2px 8px -2px hsl(278 100% 64% / 0.15);
-    --shadow-card: 0 4px 12px -4px hsl(162 100% 49% / 0.15);
-    --shadow-glow: 0 0 20px hsl(162 100% 49% / 0.3);
+    --shadow-soft: 0 2px 8px -2px hsl(0 84% 60% / 0.15);
+    --shadow-card: 0 4px 12px -4px hsl(25 95% 53% / 0.15);
+    --shadow-glow: 0 0 20px hsl(25 95% 53% / 0.3);
 
     --radius: 1rem;
 
@@ -94,7 +96,7 @@ All colors MUST be HSL.
     --popover: 240 12% 10%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 278 100% 64%;
+    --primary: 0 84% 60%;
     --primary-foreground: 240 10% 6%;
 
     --secondary: 240 10% 16%;
@@ -103,7 +105,7 @@ All colors MUST be HSL.
     --muted: 240 10% 14%;
     --muted-foreground: 240 4% 72%;
 
-    --accent: 162 100% 49%;
+    --accent: 25 95% 53%;
     --accent-foreground: 240 10% 6%;
 
     --destructive: 0 62.8% 30.6%;
@@ -113,29 +115,31 @@ All colors MUST be HSL.
     --input: 240 12% 18%;
     --ring: 162 100% 49%;
     
-    --lottery-orange: 278 100% 64%;
-    --lottery-orange-light: 162 100% 49%;
-    --lottery-orange-dark: 168 100% 35%;
+    --lottery-orange: 0 84% 60%;
+    --lottery-orange-light: 25 95% 53%;
+    --lottery-orange-dark: 0 84% 50%;
     --lottery-bg: 240 10% 6%;
     --lottery-card: 240 12% 10%;
     --lottery-border: 240 12% 18%;
     --sidebar-background: 240 10% 6%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 278 100% 64%;
+    --sidebar-primary: 0 84% 60%;
     --sidebar-primary-foreground: 240 10% 6%;
     --sidebar-accent: 240 10% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 240 12% 18%;
-    --sidebar-ring: 162 100% 49%;
+    --sidebar-ring: 25 95% 53%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }

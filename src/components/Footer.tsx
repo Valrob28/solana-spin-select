@@ -28,11 +28,11 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
                 <Trophy className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">LuckySol.xyz</h3>
-                <p className="text-sm text-muted-foreground">Solana Lottery</p>
+                <h3 className="text-lg font-bold text-black">LuckySol.xyz</h3>
+                <p className="text-sm text-gray-600">Solana Lottery</p>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
               The premier decentralized lottery platform on Solana blockchain. 
               Fair, transparent, and secure gaming experience.
             </p>
@@ -51,12 +51,12 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Quick Links</h4>
+            <h4 className="text-sm font-semibold text-black mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
                 <button 
                   onClick={onHowToPlay}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-2"
                 >
                   <HelpCircle className="h-3 w-3" />
                   How to Play
@@ -65,7 +65,7 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
               <li>
                 <button 
                   onClick={onTerms}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-2"
                 >
                   <FileText className="h-3 w-3" />
                   Terms & Conditions
@@ -74,7 +74,7 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
               <li>
                 <button 
                   onClick={onFAQ}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-2"
                 >
                   <HelpCircle className="h-3 w-3" />
                   FAQ
@@ -83,7 +83,7 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
               <li>
                 <button 
                   onClick={onAdmin}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+                  className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-2"
                 >
                   <Shield className="h-3 w-3" />
                   Admin Panel
@@ -94,8 +94,8 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
 
           {/* Game Info */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Game Information</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h4 className="text-sm font-semibold text-black mb-4">Game Information</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
               <li>• 5 numbers from 1-49</li>
               <li>• Minimum bet: 0.01 SOL</li>
               <li>• Multiple winners</li>
@@ -106,8 +106,8 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
 
           {/* Security & Trust */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Security & Trust</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h4 className="text-sm font-semibold text-black mb-4">Security & Trust</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
               <li>• Smart contract verified</li>
               <li>• Decentralized on Solana</li>
               <li>• No central authority</li>
@@ -120,10 +120,10 @@ const Footer = ({ onHowToPlay, onTerms, onFAQ, onAdmin }: FooterProps) => {
         {/* Bottom Section */}
         <div className="mt-8 pt-6 border-t border-lottery-border/50">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-muted-foreground text-center sm:text-left">
+            <p className="text-xs text-gray-600 text-center sm:text-left">
               © {currentYear} LuckySol.xyz. All rights reserved. Built on Solana blockchain.
             </p>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4 text-xs text-gray-600">
               <span className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 Network: Solana

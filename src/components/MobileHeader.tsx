@@ -31,19 +31,19 @@ const MobileHeader = ({ onHowToPlay, onTerms, onFAQ, onAdmin, onHome }: MobileHe
 
   return (
     <motion.header 
-      className="flex justify-between items-center p-4 max-w-7xl mx-auto lg:hidden"
+      className="flex justify-between items-center p-3 max-w-7xl mx-auto lg:hidden"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
       {/* Logo */}
       <div className="flex items-center space-x-2">
-        <div className="w-10 h-10 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-xl flex items-center justify-center shadow-lg">
-          <Trophy className="h-5 w-5 text-primary-foreground" />
+        <div className="w-8 h-8 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-lg flex items-center justify-center shadow-lg">
+          <Trophy className="h-4 w-4 text-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-foreground">LuckySol.xyz</h1>
-          <p className="text-xs text-muted-foreground">Solana blockchain</p>
+          <h1 className="text-base font-bold text-black">LuckySol.xyz</h1>
+          <p className="text-xs text-gray-600 hidden sm:block">Solana blockchain</p>
         </div>
       </div>
 
@@ -53,8 +53,8 @@ const MobileHeader = ({ onHowToPlay, onTerms, onFAQ, onAdmin, onHome }: MobileHe
         
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="h-10 w-10 p-0">
-              <Menu className="h-5 w-5" />
+            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+              <Menu className="h-4 w-4" />
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-80 bg-gradient-to-b from-lottery-bg to-lottery-orange-light border-lottery-border">
@@ -66,8 +66,8 @@ const MobileHeader = ({ onHowToPlay, onTerms, onFAQ, onAdmin, onHome }: MobileHe
                     <Trophy className="h-5 w-5 text-primary-foreground" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-foreground">LuckySol.xyz</h2>
-                    <p className="text-sm text-muted-foreground">Solana Lottery</p>
+                    <h2 className="text-lg font-bold text-black">LuckySol.xyz</h2>
+                    <p className="text-sm text-gray-600">Solana Lottery</p>
                   </div>
                 </div>
                 <Button 
@@ -105,15 +105,15 @@ const MobileHeader = ({ onHowToPlay, onTerms, onFAQ, onAdmin, onHome }: MobileHe
 
               {/* Footer */}
               <div className="mt-auto pt-6 border-t border-lottery-border/50">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Built on Solana blockchain
-                  </p>
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span>Network: Solana</span>
-                  </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-600 mb-2">
+                  Built on Solana blockchain
+                </p>
+                <div className="flex items-center justify-center gap-2 text-xs text-gray-600">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span>Network: Solana</span>
                 </div>
+              </div>
               </div>
             </div>
           </SheetContent>

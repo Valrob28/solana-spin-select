@@ -15,10 +15,11 @@ import FAQ from '@/components/FAQ';
 import DrawManager from '@/components/DrawManager';
 import LotteryManager from '@/components/LotteryManager';
 import AdminPanel from '@/components/AdminPanel';
+import TicketTracker from '@/components/TicketTracker';
 import MobileHeader from '@/components/MobileHeader';
 import Footer from '@/components/Footer';
 
-type ViewMode = 'home' | 'play' | 'dashboard' | 'how-to-play' | 'terms' | 'faq' | 'lottery-manager' | 'admin';
+type ViewMode = 'home' | 'play' | 'dashboard' | 'how-to-play' | 'terms' | 'faq' | 'lottery-manager' | 'admin' | 'ticket-tracker';
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('home');
@@ -246,8 +247,8 @@ const Index = () => {
                 </Button>
                 
                 <div className="text-right">
-                  <h1 className="text-3xl font-bold text-foreground">My Dashboard</h1>
-                  <p className="text-muted-foreground">Manage your tickets and view draw history</p>
+                  <h1 className="text-3xl font-bold text-black">My Dashboard</h1>
+                  <p className="text-gray-600">Manage your tickets and view draw history</p>
                 </div>
               </motion.div>
 
@@ -350,7 +351,7 @@ const Index = () => {
                 </Button>
                 <div className="flex items-center gap-2">
                   <Shield className="h-6 w-6 text-primary" />
-                  <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
+                  <h1 className="text-2xl font-bold text-black">Admin Panel</h1>
                 </div>
               </div>
               <AdminPanel />
@@ -362,6 +363,11 @@ const Index = () => {
               onAdmin={handleAdmin}
             />
           </div>
+        );
+
+      case 'ticket-tracker':
+        return (
+          <TicketTracker onBack={() => setViewMode('home')} />
         );
 
       

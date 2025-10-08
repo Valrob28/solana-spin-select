@@ -132,43 +132,43 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
 
       {/* Desktop Header */}
       <motion.header 
-        className="hidden lg:flex justify-between items-center p-4 sm:p-6 max-w-7xl mx-auto"
+        className="hidden lg:flex justify-between items-center p-3 sm:p-4 max-w-7xl mx-auto"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
         <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-xl flex items-center justify-center shadow-lg">
-            <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-lottery-orange-dark rounded-lg flex items-center justify-center shadow-lg">
+            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-2xl font-bold text-foreground">LuckySol.xyz</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Solana blockchain</p>
+            <h1 className="text-base sm:text-xl font-bold text-black">LuckySol.xyz</h1>
+            <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Solana blockchain</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <nav className="hidden lg:flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <nav className="hidden lg:flex items-center gap-3 text-sm">
             <button 
               onClick={onHowToPlay}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors px-2 py-1 rounded"
             >
               How to play
             </button>
             <button 
               onClick={onTerms}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors px-2 py-1 rounded"
             >
               Terms
             </button>
             <button 
               onClick={onFAQ}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-gray-600 hover:text-primary transition-colors px-2 py-1 rounded"
             >
               FAQ
             </button>
             <button 
               onClick={onAdmin}
-              className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-gray-600 hover:text-primary transition-colors flex items-center gap-1 px-2 py-1 rounded"
             >
               <Shield className="h-3 w-3" />
               Admin
@@ -191,11 +191,11 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
           </div>
         </div>
         
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 bg-gradient-to-r from-primary via-lottery-orange to-lottery-orange-dark bg-clip-text text-transparent">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-4 sm:mb-6">
           <span className="inline-block animate-[fade-in_0.6s_ease-out]">LuckySol.xyz</span>
         </h2>
         
-        <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-4 sm:mb-6 max-w-3xl mx-auto">
+        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-4 sm:mb-6 max-w-3xl mx-auto">
           <span className="inline-block animate-[fade-in_0.8s_ease-out]">Win</span>
           <span className="inline-block ml-1 sm:ml-2 animate-[fade-in_1s_ease-out]">incredible</span>
           <span className="inline-block ml-1 sm:ml-2 animate-[fade-in_1.2s_ease-out]">prizes</span>
@@ -374,8 +374,8 @@ const HomePage = ({ onConnectAndPlay, onPurchaseTickets, poolWalletAddress, pool
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1 }}
       >
-        <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">Ready to try your luck?</h3>
-        <p className="text-muted-foreground mb-6 sm:mb-8 max-w-md mx-auto text-sm sm:text-base">Connect your Solana wallet and choose your lucky numbers. Your next ticket could change everything!</p>
+        <h3 className="text-2xl sm:text-3xl font-bold text-black mb-3 sm:mb-4">Ready to try your luck?</h3>
+        <p className="text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto text-sm sm:text-base">Connect your Solana wallet and choose your lucky numbers. Your next ticket could change everything!</p>
         <Button 
           onClick={onConnectAndPlay}
           size="lg"

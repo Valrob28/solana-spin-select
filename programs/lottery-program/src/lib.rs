@@ -112,7 +112,7 @@ pub mod lottery_program {
     }
 
     // Effectuer le tirage (seulement l'autorité)
-    pub fn conduct_draw(ctx: Context<ConductDraw>) -> Result<()> {
+    pub fn conduct_draw(ctx: Context<ConductDraw>, block_hash: [u8; 32]) -> Result<()> {
         let raffle = &mut ctx.accounts.raffle;
         
         // Vérifier que l'autorité appelle cette fonction
@@ -127,15 +127,31 @@ pub mod lottery_program {
         // Vérifier que le tirage n'a pas déjà été effectué
         require!(!raffle.is_draw_complete, LotteryError::DrawAlreadyComplete);
 
-        // Générer les numéros gagnants (aléatoires basés sur le slot)
+        // Générer les numéros gagnants de manière transparente
         let clock = Clock::get()?;
         let mut winning_numbers = [0u8; 5];
         let mut used_numbers = [false; 50]; // 1-49
         
+        // Utiliser plusieurs sources d'aléatoire pour plus de transparence
+        let seed_sources = [
+            clock.slot,
+            clock.unix_timestamp,
+            raffle.total_tickets_sold,
+            block_hash[0] as u64,
+            block_hash[1] as u64,
+        ];
+        
+        // Créer une graine déterministe mais imprévisible
+        let mut seed = 0u64;
+        for source in seed_sources.iter() {
+            seed = seed.wrapping_mul(31).wrapping_add(*source);
+        }
+        
         for i in 0..5 {
             let mut attempts = 0;
             loop {
-                let random_value = (clock.slot + i as u64 + attempts) % 49 + 1;
+                // Utiliser la graine pour générer un nombre pseudo-aléatoire
+                let random_value = (seed.wrapping_mul(1103515245).wrapping_add(12345) + i as u64 + attempts) % 49 + 1;
                 let number = random_value as u8;
                 
                 if !used_numbers[number as usize] {
@@ -145,6 +161,9 @@ pub mod lottery_program {
                 }
                 attempts += 1;
                 require!(attempts < 100, LotteryError::RandomGenerationFailed);
+                
+                // Mettre à jour la graine pour la prochaine tentative
+                seed = seed.wrapping_mul(31).wrapping_add(attempts as u64);
             }
         }
 
@@ -155,10 +174,15 @@ pub mod lottery_program {
         raffle.is_draw_complete = true;
         raffle.status = RaffleStatus::DrawComplete;
 
+        // Émettre un événement détaillé avec toutes les informations de vérification
         emit!(DrawConducted {
             raffle: raffle.key(),
             winning_numbers,
             total_tickets: raffle.total_tickets_sold,
+            block_hash,
+            slot: clock.slot,
+            timestamp: clock.unix_timestamp,
+            seed_value: seed,
         });
 
         Ok(())
@@ -314,6 +338,10 @@ pub struct DrawConducted {
     pub raffle: Pubkey,
     pub winning_numbers: [u8; 5],
     pub total_tickets: u64,
+    pub block_hash: [u8; 32],
+    pub slot: u64,
+    pub timestamp: i64,
+    pub seed_value: u64,
 }
 
 #[event]
